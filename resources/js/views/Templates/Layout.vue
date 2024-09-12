@@ -73,7 +73,7 @@
                 <div class="footer__newsletter--form">
                   <form action="#">
                     <input type="email" placeholder="Your email address">
-                    <button type="submit" class="default-btn"><span>Subscribe</span></button>
+                    <button type="submit" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-light py-3 px-4 right-1 top-1 absolute"><span>Subscribe</span></button>
                   </form>
                 </div>
               </div>

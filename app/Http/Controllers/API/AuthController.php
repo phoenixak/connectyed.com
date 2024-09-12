@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -36,10 +36,21 @@ class AuthController extends Controller
             ], 401);
         }
 
+        
 
         $user = Auth::user();
         $profile = $user->profile;
         //$user = Auth::profile();
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please verify your email before logging in.',                
+                'data' => [
+                    'User' => ['Please verify your email before logging in.'] 
+                ]
+            ], 403);            
+        }
+        
         return response()->json([
             'success' => true,
             'message' => 'Authorized',
@@ -60,6 +71,8 @@ class AuthController extends Controller
                 'username' => 'required|string|max:255|unique:users',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6|confirmed',
+                'privacypolicy' => 'required|boolean',
+                'termsofuse' => 'required|boolean',
             ]);
         } catch (\Illuminate\Validation\ValidationException $res) {
             $response = $res->validator->errors();
@@ -77,10 +90,11 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        event(new Registered($user));
 
         return response()->json([
             'success' => true,
-            'message' => 'User created successfully',
+            'message' => 'User registered successfully, Please check your email for verification.',
             'data' => $user
         ]);
     }
@@ -123,6 +137,18 @@ class AuthController extends Controller
             'message' => 'Authorized',
             'data' => compact('user', 'profile')
         ]);
+    }
+
+    // Resend verification email
+    public function resendVerificationEmail(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified.'], 200);
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Verification link sent!'], 200);
     }
 
 }

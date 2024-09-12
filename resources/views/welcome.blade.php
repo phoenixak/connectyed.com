@@ -16,8 +16,7 @@
         <link rel="stylesheet" href="<?=url('/');?>/assets/css/all.min.css">
         <link rel="stylesheet" href="<?=url('/');?>/assets/css/swiper.min.css">
         <link rel="stylesheet" href="<?=url('/');?>/assets/css/lightcase.css">
-        <link rel="stylesheet" href="<?=url('/');?>/assets/css/connectyed.css">
-        @vite(['resources/css/app.js'])
+        <link rel="stylesheet" href="<?=url('/');?>/assets/css/connectyed.css">        
         @vite(['resources/js/app.js'])
     </head>
     <body class="bg-connectyed-body-light">

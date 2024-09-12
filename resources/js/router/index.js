@@ -14,8 +14,31 @@ const Register = () => import('@/views/Register.vue')
 const Home = () => import('@/views/Home.vue')
 const BlogDetail = () => import('@/views/BlogDetail.vue')
 /* Guest Component */
+const EmailVerification = () => import('@/components/EmailVerification.vue')
 
 const routes = [
+    {
+        path: '/email/verify',
+        name: '',
+        component: GuestLayout,
+        meta: {
+            middleware: "guest"
+        },        
+        children: [
+            {
+                name: "EmailVerification",
+                path: '/email/verify',
+                component: EmailVerification,
+                props: true,
+                meta: {
+                    title: `EmailVerification`
+                },
+                props: route => ({
+                    verificationUrl: route.query.verification_url
+                }),
+            }
+        ]
+    },
     {
         path: "/",
         component: GuestLayout,

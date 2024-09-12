@@ -17,8 +17,8 @@ class Profile extends Model
         'city',
         'state',
         'country',
+        'location',
         'age',
-        'zodiac',
         'weight',
         'height',
         'eyecolor',
@@ -34,7 +34,10 @@ class Profile extends Model
         'sports',
         'hobbies',
         'english',
-        'languages'
+        'languages',
+        'avatar',
+        'description',
+        'comment'
     ];
 
     public function user()

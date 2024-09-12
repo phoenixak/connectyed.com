@@ -48,8 +48,8 @@ class PostsController extends Controller
      * Display the specified resource.
      */
     public function featured()
-    {
-        $data = DB::table('posts as p')
+    {      
+        $posts = DB::table('posts as p')
         ->select(
           'p.id as id',
           'p.title as title',
@@ -61,11 +61,32 @@ class PostsController extends Controller
         ->leftJoin('users as u', 'u.id', '=', 'p.author_id')
         ->where('featured','=', 1)
         ->get();       
-        return response()->json([
-            "success" => true,
-            "data" => $data,
-            "message" => 'Featured Post'
-        ], 200);
+
+        $dataarr = [];
+      foreach ($posts as $post) {
+          $imgsrc = Self::get_img_content($post->content);
+          $data = array('id' => $post->id,
+                    'title' => $post->title,
+                    'content' => $post->content,
+                    'slug' => $post->slug,
+                    'image' => $imgsrc,                    
+                    'name' => $post->name,
+                    'created_at' => $post->created_at,
+                    'post_date' => $post->post_date);
+          array_push($dataarr, $data);
+      }      
+      return response()->json([
+          "success" => true,
+          "data" => $dataarr,
+          "message" => 'Featured Post'
+      ], 200);
+    }
+
+    public function get_img_content($content)
+    {
+      preg_match('/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $content_image_1);
+      $imgsrc = (isset($content_image_1['src'])) ? $content_image_1['src'] : url('/')."/upload/images/no-image.jpg";
+      return $imgsrc;
     }
 
     public static function slugify($text)

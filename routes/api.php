@@ -5,6 +5,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PostsController;
 use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\CommentsController;
+use App\Http\Controllers\API\VerificationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,13 +35,20 @@ Route::prefix('post')->group(function () {
 
 Route::resource('/post', PostsController::class);
 
-Route::put('/updateprofile', [ProfileController::class, 'updateprofile']);
-
-Route::resource('/comment', CommentsController::class);
-
-Route::controller(CommentsController::class)->group(function () {
-    Route::get('comment/list/{post_id}', 'list');
-    Route::post('comment/islike', 'isLike');
-    Route::post('comment/like', 'like');
-    Route::post('comment/unlike', 'unlike');
+Route::prefix('profile')->group(function () {
+    Route::controller(ProfileController::class)->group(function () {
+        Route::put('update', 'updateprofile');
+        Route::get('getprofile', 'getprofile');
+        Route::get('images', 'profileimages');
+        Route::post('uploadimages', 'uploadimages');
+        Route::put('updateavatar', 'updateavatar');
+    });
 });
+
+
+Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+    ->middleware(['signed'])
+    ->name('verification.verify');
+
+
+

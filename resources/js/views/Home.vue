@@ -44,9 +44,8 @@
 	<!-- ================> Story section start here <================== -->
 	<div class="story bg_img padding-top padding-bottom">
 		<div class="container">
-			<div class="section__header style-2 text-center wow fadeInUp" data-wow-duration="1.5s">
-				<h2>Connectyed Blogs</h2>
-				<p>Explore expert insights, personal stories, and the latest trends in matchmaking. Whether you're looking for advice or inspiration, our blogs offer valuable tips to help you build meaningful connections.</p>
+			<div class="section__header style-2 text-center wow fadeInUp" data-wow-duration="1.5s">				
+				
 			</div>
 			<div class="section__wrapper">
 				<div class="row g-4 justify-content-center row-cols-lg-3 row-cols-sm-2 row-cols-1">
@@ -54,20 +53,10 @@
 						<div class="story__item">
 							<div class="story__inner">
 								<div class="story__thumb">
-									<a href="#"><img src="assets/images/story/01.png" alt="dating thumb"></a>
-									<span class="member__activity member__activity--ofline">Entertainment</span>
+									<a v-bind:href="post.slug"><img :src="post.image" alt="dating thumb"></a>									
 								</div>
 								<div class="story__content">
-									<a href="#" class="text-"><h4>{{ post.title }}</h4></a>
-									<div class="story__content--author">
-										<div class="story__content--thumb">
-											<img src="assets/images/story/author/01.png" alt="dating thumb">
-										</div>
-										<div class="story__content--content">
-											<h6>{{ post.name }}</h6>
-											<p>{{ post.post_date }}</p>
-										</div>
-									</div>
+									<a v-bind:href="post.slug" class="text-"><h4 class="h-20">{{ post.title }}</h4></a>							
 								</div>
 							</div>
 						</div>
@@ -195,6 +184,5 @@ import usePosts from "../composables/posts";
 const { featuredPosts, getFeaturedPosts } = usePosts()
 onMounted(() => {
 	getFeaturedPosts()	
-	console.log(featuredPosts)
 })        
 </script>
