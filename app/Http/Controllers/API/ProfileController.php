@@ -16,7 +16,7 @@ class ProfileController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['getdetail']]);
     }            
 
     /**
@@ -33,9 +33,10 @@ class ProfileController extends Controller
         $profile->country = $request->input('profile.country');
         $profile->location = $request->input('profile.location');
         $profile->age = $request->input('profile.age');
-        $profile->weight = $request->input('profile.weight');
-        $profile->height = $request->input('profile.height');        
         $profile->haircolor = $request->input('profile.haircolor');
+        $profile->weight = $request->input('profile.weight');
+        $profile->height = $request->input('profile.height');     
+        $profile->height = $request->input('profile.inches');     
         $profile->maritalstatus = $request->input('profile.maritalstatus');
         $profile->children = $request->input('profile.children');
         $profile->religion = $request->input('profile.religion');
@@ -125,5 +126,17 @@ class ProfileController extends Controller
         ], 200);        
     }  
 
+    public function getdetail($username)
+    {
+        $profiles = Profile::whereHas('user', function ($query) use ($username) {
+            $query->where('username', $username);
+        })->firstOrFail();
+
+        return response()->json([
+            "success" => true,
+            "data" => $profiles,
+            "message" => 'Success'
+        ], 200);        
+    }  
 
 }

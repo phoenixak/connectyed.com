@@ -5,7 +5,32 @@
             {{ successMessage }}
             </div>
             <div class="font-bold text-xl mb-2">
-                <span class="mr-3 mb-1">Register</span>
+
+                <div class="relative">
+                    <label class="flex items-center cursor-pointer">
+                        <!-- Switch Container -->
+                        <div class="relative">
+                            <!-- Hidden checkbox input -->
+                            <input type="checkbox" v-model="user.ismatchmaker" class="sr-only" />
+
+                            <!-- Switch background -->
+                            <div
+                            :class="{
+                                'bg-connectyed-button-light': !user.ismatchmaker,
+                                'bg-connectyed-button-dark': user.ismatchmaker
+                            }"
+                            class="block w-14 h-8 rounded-full transition-colors duration-300"
+                            ></div>
+
+                            <!-- Switch handle -->
+                            <div
+                            class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300"
+                            :class="{ 'translate-x-6': user.ismatchmaker }"
+                            ></div>
+                        </div>
+                        <span class="ml-3 text-gray-700 text-base">{{ user.ismatchmaker ? 'Register as Matchmaker' : 'Switch to register as Matchmaker' }}</span>
+                    </label>                            
+                </div>  
                 <span class="float-right" v-if="processing"><img class="h-5 ml-3" src="assets/images/icons/process.gif"></span>
             </div>
             <form class="bg-connectyed-card-light shadow-md rounded px-8 pt-6 pb-8 mb-4 border-solid border-2 border-gray-200" action="javascript:void(0)" @submit="register" method="post">
@@ -16,6 +41,9 @@
                         </ul>
                     </div>
                 </div>
+
+                
+                
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
                         Name
@@ -70,6 +98,7 @@
                     </button>
                 </div>
                 <label>Already have an account? <router-link :to="{name:'login'}">Login Now!</router-link></label>
+
             </form>
             <p class="text-center text-gray-500 text-xs">
                 &copy;2024 Connectyed.
@@ -98,7 +127,8 @@ export default {
                 password:"",
                 password_confirmation: "",
                 privacypolicy:"",
-                termsofuse:""
+                termsofuse: "",
+                ismatchmaker: false,
             },
             successMessage: '',
             validationErrors: {},
@@ -106,7 +136,7 @@ export default {
             pdfUrl: '',
             modalMode: {
                 header: "",
-            },
+            },            
             processing:false
         }
     },

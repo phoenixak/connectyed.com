@@ -13,6 +13,8 @@ const Login = () => import('@/views/Login.vue')
 const Register = () => import('@/views/Register.vue')
 const Home = () => import('@/views/Home.vue')
 const BlogDetail = () => import('@/views/BlogDetail.vue')
+const ProfileDetail = () => import('@/views/ProfileDetail.vue')
+
 /* Guest Component */
 const EmailVerification = () => import('@/components/EmailVerification.vue')
 
@@ -110,7 +112,7 @@ const routes = [
         ]
     },   
     {
-        path: "/:slug",
+        path: "/tips/:slug",
         component: GuestLayout,
         meta: {
             middleware: "guest"
@@ -118,10 +120,27 @@ const routes = [
         children: [
             {
                 name: "blogdetail",
-                path: '/:slug',
+                path: '/tips/:slug',
                 component: BlogDetail,
                 meta: {
                     title: `Blog Detail`
+                }
+            }
+        ]
+    },
+    {
+        path: "/:username",
+        component: GuestLayout,
+        meta: {
+            middleware: "guest"
+        },
+        children: [
+            {
+                name: "profiledetail",
+                path: '/:username',
+                component: ProfileDetail,
+                meta: {
+                    title: `Profile Detail`
                 }
             }
         ]

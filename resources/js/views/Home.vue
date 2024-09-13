@@ -12,7 +12,7 @@
 								<a href="#">
 									<span>
 										<router-link :to="{name:'register'}" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-light py-4 px-5">
-											Free matchmaking until 9/15
+											Free matchmaking until 9/18
 										</router-link>
 									</span></a>
 							</div>
@@ -45,7 +45,7 @@
 	<div class="story bg_img padding-top padding-bottom">
 		<div class="container">
 			<div class="section__header style-2 text-center wow fadeInUp" data-wow-duration="1.5s">				
-				
+				<h2>Dating Tips</h2>
 			</div>
 			<div class="section__wrapper">
 				<div class="row g-4 justify-content-center row-cols-lg-3 row-cols-sm-2 row-cols-1">
@@ -135,44 +135,7 @@
 	</div>
     <!-- ================> About section end here <================== -->
 
-	<!-- ================> Work section start here <================== -->
-	<div class="work work--style2 padding-top padding-bottom bg_img hidden" style="background-image: url(assets/images/bg-img/01.jpg);">
-		<div class="container">
-			<div class="section__wrapper">
-				<div class="row g-4 justify-content-center">
-					<div class="col-xl-6 col-lg-8 col-12 wow fadeInLeft" data-wow-duration="1.5s">
-						<div class="work__item">
-							<div class="work__inner">
-								<div class="work__thumb">
-									<img src="assets/images/work/09.png" alt="dating thumb">
-								</div>
-								<div class="work__content">
-									<h3>Trust And Safety</h3>
-									<p>Choose from one of our membership levels and unlock features you need. </p>
-									<a href="policy.html" class="default-btn"><span>See More Details</span></a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xl-6 col-lg-8 col-12 wow fadeInRight" data-wow-duration="1.5s">
-						<div class="work__item">
-							<div class="work__inner">
-								<div class="work__thumb">
-									<img src="assets/images/work/10.png" alt="dating thumb">
-								</div>
-								<div class="work__content">
-									<h3>Simple Membership</h3>
-									<p>Choose from one of our membership levels and unlock features you need. </p>
-									<a href="membership.html" class="default-btn reverse"><span>Membership Details</span></a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-    <!-- ================> Work section end here <================== -->
+	
 
 </template>
 

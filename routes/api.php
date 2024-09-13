@@ -39,6 +39,7 @@ Route::prefix('profile')->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::put('update', 'updateprofile');
         Route::get('getprofile', 'getprofile');
+        Route::get('getdetail/{post_id}', 'getdetail');        
         Route::get('images', 'profileimages');
         Route::post('uploadimages', 'uploadimages');
         Route::put('updateavatar', 'updateavatar');

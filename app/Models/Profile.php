@@ -21,7 +21,7 @@ class Profile extends Model
         'age',
         'weight',
         'height',
-        'eyecolor',
+        'inches',
         'haircolor',
         'maritalstatus',
         'children',
