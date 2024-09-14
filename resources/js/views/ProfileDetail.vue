@@ -204,8 +204,7 @@ export default {
             this.processing = true
             const username = this.$route.params.username
             await axios.get('/api/profile/getdetail/'+username)
-                .then((response) => {    
-                    console.log("response", response.data)                
+                .then((response) => {                                    
                     this.currentAvatar = response.data.data.avatar
                     this.profile = response.data.data
             }).catch((error)=>{

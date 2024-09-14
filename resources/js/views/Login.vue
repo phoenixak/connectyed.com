@@ -46,7 +46,8 @@
 </template>
     
     <script>
-    import { mapActions } from 'vuex'
+    import { mapActions } from 'vuex'       
+                    
     export default {
         name:"login",
         data(){
@@ -63,14 +64,22 @@
             ...mapActions({
                 signIn:'auth/login'
             }),
-            async login(){
+            async login() {                
                 this.processing = true
-                await axios.post('/api/user/login',this.auth).then(({data})=>{                    
+                await axios.post('/api/user/login', this.auth).then(({ data }) => {                        
                     localStorage.setItem("user", JSON.stringify(data))                    
                     axios.defaults.headers.common.Authorization = `Bearer ${data.authorization.token}`
-                    this.signIn()
-                    this.$router.push({name:"dashboard"})
-                }).catch(({response})=>{
+                    this.signIn()                                        
+                    if (data.data.user.role === 'admin') {
+                        this.$router.push({ name: 'admin' });
+                    } else if (data.data.user.role === 'matchmaker') {
+                        this.$router.push({ name: 'matchmaker' });                        
+                    } else if (data.data.user.role === 'candidate') {
+                        this.$router.push({ name: 'matchmaker' });
+                    } else if (data.data.user.role === 'client') {                       
+                        this.$router.push({ name: 'dashboard' });                        
+                    }
+                }).catch((response ) => {                    
                     if(response.status===422){
                         this.validationErrors = response.data.data
                     } else {                                      

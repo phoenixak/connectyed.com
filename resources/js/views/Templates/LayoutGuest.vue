@@ -30,12 +30,7 @@
 									<a href="#">
                     <router-link :to="{name:'home'}" class="nav-link">Home</router-link>
                   </a>									
-								</li>																
-                				<li v-if="!!user.user">
-									<a href="#">
-										<router-link :to="{name:'dashboard'}" class="nav-link">Dashboard</router-link>
-									</a>									
-								</li>																
+								</li>
 							</ul>
 						</div>
 						<div class="header__more">
@@ -128,7 +123,7 @@ const route = useRoute();
 const currentRouteName = computed(() => route.name)
 const auth = reactive(store.state.auth)
 const user = auth.user
-  
+
 const logout = async () => {  
   const token = auth.authorization.token
 

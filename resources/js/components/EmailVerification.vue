@@ -23,9 +23,7 @@ export default {
   },
   methods: {
     async verifyEmail() {
-      try {
-        console.log("VERIfying")
-        console.log(this.verificationUrl);
+      try {                
         const response = await fetch(this.verificationUrl);
 
         if (response.ok) {

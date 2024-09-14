@@ -1,16 +1,16 @@
 import { createStore } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
-import auth from '@/store/auth'
-import post from '@/store/post'
+import auth from './auth'
 
 const store = createStore({
-    plugins:[
-        createPersistedState()
-    ],
     modules:{
-        auth,
-        post
-    }
+        auth       
+    },
+    plugins: [
+        createPersistedState({
+            storage: window.localStorage,           
+        }),
+    ],
 })
 
 export default store

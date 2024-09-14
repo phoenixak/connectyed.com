@@ -1,3 +1,5 @@
+import { light } from '@fortawesome/fontawesome-svg-core/import.macro';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -36,6 +38,11 @@ export default {
           DEFAULT: '#F5F5F5',
           dark: '#E0E0E0',
         },
+        'connectyed-card-mm': {
+          light: '#E9E9E9',
+          DEFAULT: '#E9E9E9',
+          dark: '#383738',
+        },      
         'connectyed-card-border': {
           light: '#E0E0E0',
           DEFAULT: '#E0E0E0',
@@ -51,6 +58,21 @@ export default {
           DEFAULT: '#007BFF',
           dark: '#0056b3',
         },
+        'connectyed-sidenav': {
+          light: '#383738',
+          DEFAULT: '#383738',
+          dark: '#d1d5db',
+        },
+        'connectyed-textnav': {
+          light: '#d1d5db',
+          DEFAULT: '#d1d5db',
+          dark: '#383738',
+        },
+        'connectyed-icon': {
+          light: '#d1d5db',
+          DEFAULT: '#d1d5db',
+          dark: '#383738',
+        }        
       }, 
     },
   },

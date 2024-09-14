@@ -6,7 +6,8 @@ export default {
     state:{
         authenticated:false,
         user:{},
-        authorization:{}
+        authorization:{},
+        userRole: null,
     },
     getters:{
         authenticated(state){
@@ -14,7 +15,8 @@ export default {
         },
         user(state){
             return state.user
-        }
+        },
+        userRole: (state) => state.userRole,
     },
     mutations:{
         SET_AUTHENTICATED (state, value) {
@@ -22,10 +24,18 @@ export default {
         },
         SET_USER (state, value) {
             state.user = value
+            state.userRole = value.role
         },
         SET_TOKEN (state, value) {
             state.authorization = value
-        }
+        },
+        CLEAR_USER(state) {
+            state.user = null
+            state.userRole = null
+        },
+        SET_USER_ROLE (state, value) {
+            state.userRole = value
+        },
     },
     actions:{
         login({commit}){ 
@@ -36,9 +46,10 @@ export default {
                 const localUser = JSON.parse(localStorage.getItem('user'))                
                 commit('SET_USER', localUser.data)
                 commit('SET_AUTHENTICATED',true)
-                commit('SET_TOKEN',localUser.authorization)
+                commit('SET_TOKEN', localUser.authorization)
+                commit('SET_USER_ROLE', localUser.data.user.role)                
                 router.push({name:'dashboard'})
-            }).catch(({response:{data}})=>{
+            }).catch((response)=>{
                 commit('SET_USER',{})
                 commit('SET_AUTHENTICATED',false)
                 commit('SET_TOKEN',{})
@@ -48,6 +59,8 @@ export default {
             commit('SET_USER',{})
             commit('SET_AUTHENTICATED',false)
             commit('SET_TOKEN',{})
+            commit('CLEAR_USER', {})
+            commit('SET_USER_ROLE', {})
             localStorage.removeItem("user")
             localStorage.removeItem("vuex")
         }
