@@ -1,10 +1,5 @@
 <template>
-    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 flex items-center justify-center">
-
-
-        
-
-
+    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 flex items-center justify-center">        
         <div class="w-full max-w-sm mt-20 ">
             <div class="font-bold text-xl mb-2">Login</div>
             <form class="bg-connectyed-card-light shadow-md rounded px-8 pt-6 pb-8 mb-4 border-solid border-2 border-gray-200" action="javascript:void(0)" method="post">
@@ -37,7 +32,13 @@
                 </div>
         
                 <label>Don't have an account? <router-link :to="{name:'register'}">Register Now!</router-link></label>
+                <div class="mt-4">
+                <router-link to="/password/forgot" class="text-blue-500 hover:underline">
+                    Forgot your password?
+                </router-link>
+            </div>
             </form>
+
             <p class="text-center text-gray-500 text-xs">
                 &copy;2024 Connectyed.
             </p>
@@ -79,11 +80,13 @@
                     } else if (data.data.user.role === 'client') {                       
                         this.$router.push({ name: 'dashboard' });                        
                     }
-                }).catch((response ) => {                    
+                }).catch(({response}) => {                    
                     if(response.status===422){
                         this.validationErrors = response.data.data
+                        //console.log(response)
                     } else {                                      
                         this.validationErrors = response.data.data
+                        //console.log("2", response)
                     }
                 }).finally(()=>{
                     this.processing = false

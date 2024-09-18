@@ -4,8 +4,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PostsController;
 use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\SpecialtiesController;
 use App\Http\Controllers\API\CommentsController;
 use App\Http\Controllers\API\VerificationController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -43,13 +46,22 @@ Route::prefix('profile')->group(function () {
         Route::get('images', 'profileimages');
         Route::post('uploadimages', 'uploadimages');
         Route::put('updateavatar', 'updateavatar');
+        Route::post('uploadavatar', 'uploadavatar');
     });
 });
 
+Route::prefix('specialties')->group(function () {
+    Route::controller(SpecialtiesController::class)->group(function () {
+        Route::put('update', 'updatespecialties');
+        Route::get('getspecialties', 'getspecialties');
+    });
+});
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
     ->middleware(['signed'])
     ->name('verification.verify');
 
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::post('password/reset', [ForgotPasswordController::class, 'reset']);
 
 

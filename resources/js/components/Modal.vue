@@ -51,6 +51,9 @@
 </template>
 
 <style>
+  .modal-overlay {
+    z-index: 1;
+  }
   .modal-backdrop {
     position: fixed;
     top: 0;

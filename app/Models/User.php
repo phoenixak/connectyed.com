@@ -76,17 +76,21 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasOne(Profile::class);
     }
 
-    public static function boot()
-    {
-        parent::boot();
-
-        self::created(function ($model) {
-            $profile = new Profile();
-            $model->profile()->save($profile);
-        });
+    public function specialties()
+    {        
+        return $this->hasOne(Specialties::class);
     }
 
-    // Override the sendEmailVerificationNotification method
+    // public static function boot()
+    // {
+    //     parent::boot();
+
+    //     self::created(function ($model) {
+    //         $profile = new Profile();
+    //         $model->profile()->save($profile);
+    //     });
+    // }
+    
     public function sendEmailVerificationNotification()
     {
         $this->notify(new CustomVerifyEmail);

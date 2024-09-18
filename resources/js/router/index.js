@@ -9,7 +9,11 @@ const Home = () => import('@/views/Home.vue')
 const BlogDetail = () => import('@/views/BlogDetail.vue')
 const ProfileDetail = () => import('@/views/ProfileDetail.vue')
 const EmailVerification = () => import('@/components/EmailVerification.vue')
+const ForgotPassword = () => import('@/components/ForgotPasswordForm.vue')
+const ResetPassword = () => import('@/components/ResetPasswordForm.vue')
 const Unauthorized = () => import('@/views/Unauthorized.vue')
+
+
 
 /*Clients*/
 const ClientLayout = () => import('@/views/Client/Layout.vue')
@@ -18,8 +22,14 @@ const ClientDashboard = () => import('@/views/Client/Dashboard.vue')
 /*Matchmaker*/
 const MatchmakerLayout = () => import('@/views/Matchmaker/Layout.vue')
 const MatchmakerDashboard = () => import('@/views/Matchmaker/Dashboard.vue')
+const MatchmakerOverview = () => import('@/views/Matchmaker/Overview.vue')
 const MatchmakerProfile = () => import('@/views/Matchmaker/Profile.vue')
-const MatchmakerSpecialties= () => import('@/views/Matchmaker/Specialties.vue')
+const MatchmakerSpecialties = () => import('@/views/Matchmaker/Specialties.vue')
+const MatchmakerMatchManagement = () => import('@/views/Matchmaker/MatchManagement.vue')
+const MatchmakerClients = () => import('@/views/Matchmaker/Clients.vue')
+const MatchmakerAvailability= () => import('@/views/Matchmaker/Availability.vue')
+const MatchmakerBilling = () => import('@/views/Matchmaker/Billing.vue')
+const MatchmakerCommunication = () => import('@/views/Matchmaker/Communication.vue')
 
 /*Admin*/
 const AdminLayout = () => import('@/views/Admin/Layout.vue')
@@ -46,6 +56,34 @@ const routes = [
                 props: route => ({
                     verificationUrl: route.query.verification_url
                 }),
+            }
+        ]
+    },
+    {
+        path: '/password',
+        name: '',
+        component: GuestLayout,
+        meta: {
+            middleware: "guest"
+        },        
+        children: [
+            {
+                name: "ForgotPassword",
+                path: 'forgot',
+                component: ForgotPassword,
+                props: true,
+                meta: {
+                    title: `ForgotPassword`
+                }
+            },
+            {
+                name: "ResetPassword",
+                path: 'reset/:hash',
+                component: ResetPassword,
+                props: true,
+                meta: {
+                    title: `ResetPassword`
+                }
             }
         ]
     },
@@ -177,13 +215,37 @@ const routes = [
                 },
                 children: [
                     {
-                      path: 'specialties', // Will match /dashboard/profile/edit
+                        path: 'dashboard', 
+                        component: MatchmakerOverview
+                    },
+                    {
+                      path: 'specialties', 
                       component: MatchmakerSpecialties
                     },
                     {
-                      path: 'profile', // Will match /dashboard/profile/view
+                      path: 'profile', 
                       component: MatchmakerProfile
-                    }
+                    },
+                    {
+                        path: 'clients', 
+                        component: MatchmakerClients
+                    },
+                    {
+                        path: 'availability', 
+                        component: MatchmakerAvailability
+                    },
+                    {
+                        path: 'billing', 
+                        component: MatchmakerBilling
+                    },
+                    {
+                        path: 'communication', 
+                        component: MatchmakerCommunication
+                    },
+                    {
+                        path: 'match-management', 
+                        component: MatchmakerMatchManagement
+                    }                    
                   ]
 
             }            

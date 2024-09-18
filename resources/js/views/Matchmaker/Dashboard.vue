@@ -29,7 +29,7 @@
 </template>
   
 <script>
-import { faTachometerAlt, faUser, faBriefcase, faUsers, faDollarSign, faEnvelope, faTasks, faChartBar } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faUser, faBriefcase, faUsers, faDollarSign, faEnvelope, faTasks, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export default {
@@ -39,10 +39,10 @@ components: {
 data() {
     return {
     menuItems: [
-        { title: "Dashboard", icon: faTachometerAlt, link: "/dashboard" },
-        { title: "Overview", icon: faChartBar, link: "/overview" },
+        { title: "Dashboard", icon: faTachometerAlt, link: "/dashboard" },        
         { title: "My Profile", icon: faUser, link: "/profile" },
         { title: "My Specialties", icon: faBriefcase, link: "/specialties" },
+        { title: "My Availability", icon: faCalendar, link: "/availability" },
         { title: "Clients", icon: faUsers, link: "/clients" },
         { title: "Billing and Subscription", icon: faDollarSign, link: "/billing" },
         { title: "Communication Tools", icon: faEnvelope, link: "/communication" },

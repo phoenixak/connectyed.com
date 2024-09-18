@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,9 @@ class ProfileController extends Controller
     public function updateprofile(Request $request)
     {
         $user = Auth::user();
-
+        // Update user details
+        $user->name = $request->input('user.name');  // Assuming the input for user's name is 'name'
+        $user->save();         
         // Update profile details
         $profile = $user->profile;
         $profile->city = $request->input('profile.city');
@@ -50,7 +53,7 @@ class ProfileController extends Controller
         $profile->languages = $request->input('profile.languages');
         $profile->description = $request->input('profile.description');
         $profile->comment = $request->input('profile.comment');
-
+        $profile->yearsexperience = $request->input('profile.yearsexperience');
         $profile->save();        
 
         return response()->json([
@@ -113,11 +116,34 @@ class ProfileController extends Controller
         ], 200);  
     }
 
+
+    public function uploadavatar(Request $request)
+    {
+        $user = Auth::user();        
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+    
+        $fileName = time().'_'.$request->file->getClientOriginalName();
+        $filePath = "/storage/".$request->file('file')->storeAs('upload/images/profiles/'.$user->id, $fileName, 'public');
+    
+        $profile = Profile::where('user_id', $user->id)->firstOrFail();
+        $profile->avatar = $filePath;
+        $profile->save();
+
+        //return response()->json(['file_path' => $filePath]);
+        return response()->json([
+            "success" => true,
+            "data" => $filePath,
+            "message" => 'Success'
+        ], 200);        
+    }
+
     public function getprofile()
     {
-        // Get all files in the 'profiles' directory
         $user = Auth::user();
-        $profile = Profile::where('user_id', $user->id)->firstOrFail();
+        $userid = $user->id;
+        $profile = Profile::with('user')->where('user_id', $userid)->first();
 
         return response()->json([
             "success" => true,

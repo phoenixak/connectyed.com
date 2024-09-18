@@ -64,7 +64,7 @@ class AuthController extends Controller
 
 
     public function register(Request $request)
-    {
+    {        
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -72,7 +72,7 @@ class AuthController extends Controller
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6|confirmed',
                 'privacypolicy' => 'required|boolean',
-                'termsofuse' => 'required|boolean',
+                'termsofuse' => 'required|boolean'
             ]);
         } catch (\Illuminate\Validation\ValidationException $res) {
             $response = $res->validator->errors();
@@ -89,6 +89,30 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->input('ismatchmaker') ? "candidate" : "client"
+        ]);
+
+        $profile = Profile::create([
+            'user_id' => $user->id,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'location' => $request->currentLocation,
+            'age' => $request->age,
+            'haircolor' => $request->hairColor,
+            'weight' => $request->weight,
+            'height' => $request->heightFeet,
+            'inches' => $request->heightInches,
+            'maritalstatus' => $request->maritalStatus,
+            'children' => $request->children,
+            'religion' => $request->religion,
+            'smoker' => $request->smoker,
+            'drinker' => $request->drinker,
+            'education' => $request->education,
+            'jobtitle' => $request->jobTitle,
+            'sports' => $request->sports,
+            'hobbies' => $request->hobbies,
+            'english' => $request->englishLevel,
+            'languages' => $request->languages
         ]);
 
         event(new Registered($user));

@@ -25,8 +25,13 @@ export default {
         },
         'connectyed-button': {
           light: '#e7dccf',
-          DEFAULT: '#E0FFFF',
-          dark: '#4A4A4A',
+          default: '#e7dccf',
+          dark: '#4A4A4A'          
+        },
+        'connectyed-button-pagination': {          
+          light: '#e7dccf69',
+          default: '#e7dccf69',
+          dark: '#6b728069'          
         },
         'connectyed-button-hover': {
           light: '#4A4A4A',

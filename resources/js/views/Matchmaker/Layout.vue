@@ -17,7 +17,7 @@
     <div class="header__bottom">
       <div class="container">
         <nav class="navbar navbar-expand-lg">
-          <a class="navbar-brand" href="#"><h2><router-link :to="{name:'home'}" class="nav-link"><img src="assets/images/logo/connectyedlogo.png" alt="Connectyed Logo" class="w-[70px]"></router-link></h2></a>
+          <a class="navbar-brand" href="#"><h2><router-link :to="{name:'home'}" class="nav-link"><img src="/assets/images/logo/connectyedlogo.png" alt="Connectyed Logo" class="w-[70px]"></router-link></h2></a>
           <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
             aria-label="Toggle navigation">
