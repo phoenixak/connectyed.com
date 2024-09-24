@@ -33,7 +33,7 @@
                 </li>								
                 <li>
                   <a href="#">
-                    <router-link :to="{name:'dashboard'}" class="nav-link">Dashboard</router-link>
+                    <router-link :to="{name:'matchmaker'}" class="nav-link">Dashboard</router-link>
                   </a>									
                 </li>																
               </ul>
@@ -129,17 +129,23 @@
   const user = auth.user
   
   const logout = async () => {  
-    const token = auth.authorization.token  
-    //const headers = { 'Authorization': `Bearer ${token}` }
-    await axios.post('/api/user/logout').then(({data})=>{
-      localStorage.getItem("user", JSON.stringify(data))                    
-	    axios.defaults.headers.common.Authorization = `Bearer ${data.authorization.token}`
+    if (auth.authorization) {
+      const token = auth.authorization.token  
+      //axios.defaults.headers.common.Authorization = `Bearer ${data.authorization.token}`
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
+      await axios.post('/api/user/logout').then(({data})=>{
+        localStorage.getItem("user", JSON.stringify(data))                    
+        store.dispatch('auth/logout')
+        router.push({name:"home"})                  
+      }).catch((error) => {      
+        console.error(error)
+        store.dispatch('auth/logout')
+        router.push({name:"home"}) 
+      })
+    } else {
       store.dispatch('auth/logout')
-      router.push({name:"home"})                  
-    }).catch((error) => {      
-      console.error(error)
-      store.dispatch('auth/logout')
-      router.push({name:"home"}) 
-    }) 
+      router.push({name:"home"})
+    }
+     
   }
   </script>

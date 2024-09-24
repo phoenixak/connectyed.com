@@ -12,16 +12,21 @@ const EmailVerification = () => import('@/components/EmailVerification.vue')
 const ForgotPassword = () => import('@/components/ForgotPasswordForm.vue')
 const ResetPassword = () => import('@/components/ResetPasswordForm.vue')
 const Unauthorized = () => import('@/views/Unauthorized.vue')
+const NotFound = () => import('@/views/NotFound.vue')
 
 
 
 /*Clients*/
-const ClientLayout = () => import('@/views/Client/Layout.vue')
 const ClientDashboard = () => import('@/views/Client/Dashboard.vue')
+const ClientLayout = () => import('@/views/Client/Layout.vue')
+const ClientOverview = () => import('@/views/Client/Overview.vue')
+const ClientProfile = () => import('@/views/Client/Profile.vue')
+const ClientMessage = () => import('@/views/Client/Message.vue')
+const ClientBilling = () => import('@/views/Client/Billing.vue')
 
 /*Matchmaker*/
-const MatchmakerLayout = () => import('@/views/Matchmaker/Layout.vue')
 const MatchmakerDashboard = () => import('@/views/Matchmaker/Dashboard.vue')
+const MatchmakerLayout = () => import('@/views/Matchmaker/Layout.vue')
 const MatchmakerOverview = () => import('@/views/Matchmaker/Overview.vue')
 const MatchmakerProfile = () => import('@/views/Matchmaker/Profile.vue')
 const MatchmakerSpecialties = () => import('@/views/Matchmaker/Specialties.vue')
@@ -34,7 +39,9 @@ const MatchmakerCommunication = () => import('@/views/Matchmaker/Communication.v
 /*Admin*/
 const AdminLayout = () => import('@/views/Admin/Layout.vue')
 const AdminDashboard = () => import('@/views/Admin/Dashboard.vue')
-
+const AdminOverview = () => import('@/views/Admin/Overview.vue')
+const AdminMatchmakers = () => import('@/views/Admin/Matchmakers.vue')
+const AdminClients = () => import('@/views/Admin/Clients.vue')
 
 const routes = [
     {
@@ -172,15 +179,15 @@ const routes = [
                 }
             }
         ]
-    },
-    {
-        path: "/admin",
+    },    
+    {        
         name: "admin",
+        path: "/admin",
         component: AdminLayout,
         meta: {
             middleware: "auth",
             title: "Admin Dashboard",
-            role: 'admin'
+            role: "admin"                     
         },
         children: [
             {
@@ -190,14 +197,28 @@ const routes = [
                 component: AdminDashboard,
                 meta: {
                     title: `Admin Dashboard`
-                }
-            }
-            
-        ]
-    },
+                },
+                children: [
+                    {
+                        path: 'dashboard', 
+                        component: AdminOverview
+                    },                    
+                    {
+                        path: 'matchmakers', 
+                        component: AdminMatchmakers
+                    },
+                    {
+                        path: 'clients', 
+                        component: AdminClients
+                    }                    
+                ]
+
+            }            
+        ]        
+    }, 
     {
-        path: "/matchmaker",
         name: "matchmaker",
+        path: "/matchmaker",
         component: MatchmakerLayout,
         meta: {
             middleware: "auth",
@@ -251,27 +272,45 @@ const routes = [
             }            
         ]
     },
-    {
-        path: "/dashboard",
-        name: "dashboard",
+    {        
+        name: "client",
+        path: "/client",
         component: ClientLayout,
         meta: {
             middleware: "auth",
-            title: "Client Dashboard",            
-            role: "client"
+            title: "Client Dashboard",
+            role: "client"                     
         },
         children: [
             {
                 props: true,     
-                name: "dashboard",
-                path: '/dashboard',
+                name: "client",
+                path: '/client',
                 component: ClientDashboard,
                 meta: {
                     title: `Client Dashboard`
-                }
-            }
-            
-        ]
+                },
+                children: [
+                    {
+                        path: 'dashboard', 
+                        component: ClientOverview
+                    },                    
+                    {
+                        path: 'profile', 
+                        component: ClientProfile
+                    },
+                    {
+                        path: 'message', 
+                        component: ClientMessage
+                    },
+                    {
+                        path: 'billing', 
+                        component: ClientBilling
+                    }                                     
+                ]
+
+            }            
+        ]        
     },        
     {
         path: "/unauthorized",
@@ -292,6 +331,25 @@ const routes = [
             }
         ]       
     },
+    {
+        path: "/notfound",
+        name: "notfound",
+        component: GuestLayout,
+        meta: {
+            middleware: "guest",
+            title: "NotFound",
+        },
+        children: [
+            {
+                name: "notfound",
+                path: '/notfound',
+                component: NotFound,
+                meta: {
+                    title: `NotFound`
+                }
+            }
+        ]       
+    },
 ]
 
 const router = createRouter({
@@ -305,14 +363,18 @@ router.beforeEach((to, from, next) => {
     // Guest Middleware
     if (to.meta.middleware === 'guest') {
         if (isAuthenticated) {
-        // Redirect to the correct dashboard based on role
-        if (userRole === 'admin') {
-            return next({ name: 'admin' });
-        } else if (userRole === 'matchmaker' || userRole === 'candidate') {
-            return next({ name: 'matchmaker' });
-        } else if (userRole === 'client') {
-            return next({ name: 'dashboard' });
-        }
+            // Redirect to the correct dashboard based on role
+            if (to.name === 'login') {
+                if (userRole === 'admin') {
+                    return next({ path: 'admin/dashboard' });
+                } else if (userRole === 'matchmaker' || userRole === 'candidate') {
+                    return next({ path: 'matchmaker/dashboard' });
+                } else if (userRole === 'client') {
+                    return next({ path: 'client/dashboard' });
+                }
+            } else {
+                return next();
+            }
         }
         return next();  // Proceed for guest
     }
@@ -321,14 +383,13 @@ router.beforeEach((to, from, next) => {
     if (to.meta.middleware === 'auth') {
         if (!isAuthenticated) {
             return next({ name: 'login' });  // Redirect to login if not authenticated
-        }
-        // Role-based access control
+        }        
         if (to.meta.role) {
             if (userRole === to.meta.role || to.meta.role.includes(userRole)) {                
-            return next();  // Allow access to route
-        } else {
-            return next({ name: 'login' });  // Redirect if role doesn't match
-        }
+                return next();  // Allow access to route
+            } else {
+                return next({ name: 'login' });  // Redirect if role doesn't match
+            }
         }
     }
 

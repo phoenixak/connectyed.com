@@ -107,7 +107,12 @@ import locationsData from './Locations.json';
 export default {
   data() {
     return {
-      specialties: {},
+      specialties: {
+        minage: '',
+        maxage: '',
+        gender: '',
+        locations: []
+      },
       searchQuery: '',
       selectedLocations: [],
       authorization:this.$store.state.auth.authorization,
@@ -115,7 +120,7 @@ export default {
     };
   },
   mounted() {      
-      this.getSpecialties();
+    this.getSpecialties();        
   },
   computed: {
     filteredLocations() {
@@ -128,8 +133,7 @@ export default {
     }
   },
   methods: {
-    async postSpecialties() {       
-        console.log("send specialties", this.specialties)     
+    async postSpecialties() {                   
         this.processing = true
         this.specialties.locations = this.selectedLocations
         const formData = this.specialties
@@ -150,10 +154,13 @@ export default {
         axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
         await axios.get('/api/specialties/getspecialties')
           .then((response) => {
-            this.specialties = response.data.data            
-            this.selectedLocations = JSON.parse(response.data.data.locations)            
+            if (response.data.data) {                
+                this.specialties = response.data.data                            
+                this.selectedLocations = (response.data.data.locations) ? JSON.parse(response.data.data.locations) : []
+            }
         }).catch((error)=>{
-            console.error(error);
+          console.error(error);
+          this.selectedLocations = []
         }).finally(()=>{
             this.processing = false
         })

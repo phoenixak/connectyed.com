@@ -47,8 +47,18 @@ export default {
                 commit('SET_USER', localUser.data)
                 commit('SET_AUTHENTICATED',true)
                 commit('SET_TOKEN', localUser.authorization)
-                commit('SET_USER_ROLE', localUser.data.user.role)                
-                router.push({name:'dashboard'})
+                commit('SET_USER_ROLE', localUser.data.user.role)   
+                console.log("localUser.data.user.role", localUser.data.user.role)
+                if (localUser.data.user.role === 'admin') {
+                    router.push({ path: 'admin/dashboard' });
+                } else if (localUser.data.user.role === 'matchmaker') {
+                    router.push({ path: 'matchmaker/dashboard' });                        
+                } else if (localUser.data.user.role === 'candidate') {
+                    router.push({ path: 'matchmaker/dashboard' });
+                } else if (localUser.data.user.role === 'client') {                       
+                    router.push({ path: 'client/dashboard' });                        
+                }
+                //router.push({name:'dashboard'})
             }).catch((response)=>{
                 commit('SET_USER',{})
                 commit('SET_AUTHENTICATED',false)

@@ -1,11 +1,44 @@
 <template>
     <div class="max-w-lg mx-auto p-4 bg-white">
-      <h2 class="text-xl font-semibold mb-4">Register</h2>
+      <h2 class="text-xl font-semibold mb-4">{{ form.ismatchmaker ? 'Matchmaker Registration' : 'Client Registration' }}</h2>
         <div v-if="successMessage" class="bg-green-200 text-green-800 p-4 mt-4 rounded absolute top-16">
         {{ successMessage }}
         </div>
+
+
+        <div class="font-bold text-xl mb-2">
+
+            <div class="relative">
+                <label class="flex items-center cursor-pointer mb-4 bg-orange-50 py-2 px-1 rounded-xl">
+                    <!-- Switch Container -->
+                    <div class="relative">
+                        <!-- Hidden checkbox input -->
+                        <input type="checkbox" v-model="form.ismatchmaker" class="sr-only" @click="switchMatchmaker"/>
+
+                        <!-- Switch background -->
+                        <div
+                        :class="{
+                            'bg-connectyed-button-light': !form.ismatchmaker,
+                            'bg-connectyed-button-dark': form.ismatchmaker
+                        }"
+                        class="block w-14 h-8 rounded-full transition-colors duration-300"
+                        ></div>
+
+                        <!-- Switch handle -->
+                        <div
+                        class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300"
+                        :class="{ 'translate-x-6': form.ismatchmaker }"
+                        ></div>
+                    </div>
+                    <span class="ml-3 text-gray-700 text-base uppercase">{{ form.ismatchmaker ? 'Switch to Register as a Client' : 'Switch to Register as a Matchmaker' }}</span>
+                </label>                            
+            </div>  
+            <span class="float-right" v-if="processing"><img class="h-5 ml-3" src="assets/images/icons/process.gif"></span>
+        </div>
+
+
       <!-- Step Indicator -->
-      <div class="flex items-center mb-6">        
+      <div class="flex items-center mb-6" v-if="!form.ismatchmaker">        
         <div v-for="(step, index) in steps" :key="index">
           <div @click="goToStep(step)"
             class="text-center py-2 px-3 mx-1 rounded-full cursor-pointer"
@@ -59,6 +92,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
                 <input-text label="Age" v-model="form.age" :required="true" :error="!!errors.age"
                 :errorMessage="errors.age"/>
+                <select-option label="Gender" :options="genders" v-model="form.gender" :required="true" :error="!!errors.gender"
+                :errorMessage="errors.gender"/>
                 <input-text label="Hair Color" v-model="form.hairColor" :required="true" :error="!!errors.hairColor"
                 :errorMessage="errors.hairColor"/>
                 <input-text label="Weight (lbs)" v-model="form.weight" :required="true" :error="!!errors.weight"
@@ -159,7 +194,7 @@
                 class="bg-connectyed-button-light hover:bg-connectyed-button-hover-light text-connectyed-button-hover-light hover:text-connectyed-button-hover-dark py-2 px-4 rounded float-right"
                 type="submit"
                 :disabled="processing"
-                @click="login"
+                @click="register"
                 >
                 {{ processing ? "Please wait" : "Register" }}
                 </button>
@@ -183,6 +218,7 @@ import SelectOption from '../components/SelectOption.vue';
 // Other imports
 
 export default {
+    name:"register",
     components: {
         InputText,
         SelectOption,
@@ -203,6 +239,7 @@ export default {
                 country: "",
                 currentLocation: "",
                 age: "",
+                gender: "",
                 hairColor: "",
                 weight: "",
                 heightFeet: "",
@@ -219,7 +256,8 @@ export default {
                 englishLevel: "",
                 languages: "",
                 privacypolicy: false,
-                termsofuse: false
+                termsofuse: false,
+                ismatchmaker: false
           },
             errors: {
                 name: '',
@@ -232,6 +270,7 @@ export default {
                 country: '',
                 currentLocation: '',
                 age: '',
+                gender: '',
                 hairColor: '',
                 weight: '',
                 heightFeet: '',
@@ -252,6 +291,7 @@ export default {
           },
             errorCount: 0,
             countries: ['United States of America', 'Canada'],
+            genders: ['Male', 'Female'],
             maritalStatuses: ['Single', 'Separated', 'Divorced'],
             childrenOptions: ['0', '1', '2', '3', '4'],
             religions: ['Buddhism', 'Catholic', 'Christian', 'Confucianism', 'Hinduism', 'Islam', 'Jainism', 'Judaism', 'Shinto', 'Sikhism', 'Taoism', 'Zoroastrianism', 'Other'],
@@ -270,7 +310,7 @@ export default {
     },
     methods: {
         ...mapActions({
-            signIn:'auth/login'
+            signIn:'auth/register'
         }),
         nextStep() {
             this.clearErrors();           
@@ -308,6 +348,9 @@ export default {
             } else if (this.currentStep == 3) {
                 if (this.form.age === '') {
                     this.errors.age = 'Age is required';
+                    this.errorCount++;
+                } else if (this.form.gender === '') {
+                    this.errors.gender = 'Gender is required';
                     this.errorCount++;
                 } else if (this.form.hairColor === '') {
                     this.errors.hairColor = 'Hair Color is required';
@@ -370,7 +413,15 @@ export default {
             }
             if (this.errorCount === 0) {
                 if (this.currentStep < this.steps.length) {
-                    this.currentStep++;                    
+                    if (this.form.ismatchmaker === true) {
+                        if (this.currentStep == 2) {
+                            this.currentStep = this.currentStep+4;    
+                        } else {
+                            this.currentStep++;    
+                        }
+                    } else {
+                        this.currentStep++;
+                    }                                        
                 }   
             }               
             this.errorCount = 0;
@@ -387,6 +438,7 @@ export default {
                 country: '',
                 currentLocation: '',
                 age: '',
+                gender: '',
                 hairColor: '',
                 weight: '',
                 heightFeet: '',
@@ -408,7 +460,15 @@ export default {
         },
         prevStep() {
             if (this.currentStep > 1) {
-            this.currentStep--;
+                if (this.form.ismatchmaker === true) {
+                    if (this.currentStep == 6) {
+                        this.currentStep = this.currentStep-4;
+                    } else {
+                        this.currentStep--;
+                    }
+                } else {
+                    this.currentStep--;
+                }             
             }
         },
         goToStep(number) {
@@ -453,6 +513,12 @@ export default {
             }).finally(()=>{
                 this.processing = false
             })
+        },
+        switchMatchmaker() {
+            this.form.ismatchmaker = !this.form.ismatchmaker
+            if (this.form.ismatchmaker === true) {
+                this.steps = [1, 2, 6]
+            }
         }
     }
   };

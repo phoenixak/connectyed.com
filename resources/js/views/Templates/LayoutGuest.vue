@@ -41,7 +41,6 @@
                 <router-link :to="{name:'login'}" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-light py-4 px-5">Login</router-link>
               </button>
             
-              <a @click="logout" href="javascript:void(0)" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-light py-4 px-5" aria-current="page" v-if="!!user.user">Logout</a>
 						</div>
 					</div>
 				</nav>
@@ -124,17 +123,19 @@ const currentRouteName = computed(() => route.name)
 const auth = reactive(store.state.auth)
 const user = auth.user
 
-const logout = async () => {  
-  const token = auth.authorization.token
+// console.log("auth", user)
 
-  await axios.post('/api/user/logout').then(({data})=>{
-    axios.defaults.headers.common.Authorization = `Bearer ${token}`
-    store.dispatch('auth/logout')
-    router.push({name:"home"})                  
-  }).catch((error) => {
-    console.error(error)
-    store.dispatch('auth/logout')
-    router.push({name:"home"}) 
-  }) 
-}
+// const logout = async () => {  
+//   const token = auth.authorization.token
+
+//   await axios.post('/api/user/logout').then(({data})=>{
+//     axios.defaults.headers.common.Authorization = `Bearer ${token}`
+//     store.dispatch('auth/logout')
+//     router.push({name:"home"})                  
+//   }).catch((error) => {
+//     console.error(error)
+//     store.dispatch('auth/logout')
+//     router.push({name:"home"}) 
+//   }) 
+// }
 </script>

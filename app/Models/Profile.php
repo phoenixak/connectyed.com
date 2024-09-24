@@ -14,11 +14,13 @@ class Profile extends Model
     protected $fillable = [
         'name',
         'user_id',
+        'matchmaker_id',
         'city',
         'state',
         'country',
         'location',
         'age',
+        'gender',
         'weight',
         'height',
         'inches',
@@ -43,5 +45,17 @@ class Profile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // A matchmaker can have many clients
+    public function clients()
+    {
+        return $this->hasMany(Profile::class, 'matchmaker_id');
+    }
+
+    // A client belongs to a matchmaker
+    public function matchmaker()
+    {
+        return $this->belongsTo(Profile::class, 'matchmaker_id');
     }
 }

@@ -7,8 +7,10 @@ use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\SpecialtiesController;
 use App\Http\Controllers\API\CommentsController;
 use App\Http\Controllers\API\VerificationController;
+use App\Http\Controllers\API\AvailabilityController;
+use App\Http\Controllers\API\ClientController;
+use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,7 +48,7 @@ Route::prefix('profile')->group(function () {
         Route::get('images', 'profileimages');
         Route::post('uploadimages', 'uploadimages');
         Route::put('updateavatar', 'updateavatar');
-        Route::post('uploadavatar', 'uploadavatar');
+        Route::post('uploadavatar', 'uploadavatar');        
     });
 });
 
@@ -57,6 +59,12 @@ Route::prefix('specialties')->group(function () {
     });
 });
 
+Route::post('/matchmaker/clients', [ClientController::class, 'addClients']);
+Route::get('/matchmaker/clients/{id}', [ClientController::class, 'getClientsByMatchmakerId']);
+
+Route::get('/availabilities/{user_id}', [AvailabilityController::class, 'index']);
+Route::post('/availabilities', [AvailabilityController::class, 'store']);
+
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
     ->middleware(['signed'])
     ->name('verification.verify');
@@ -64,4 +72,7 @@ Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('password/reset', [ForgotPasswordController::class, 'reset']);
 
-
+// routes/web.php
+Route::get('/admin/candidates', [AdminController::class, 'getCandidates']);
+Route::post('/admin/candidates/approve', [AdminController::class, 'approveCandidate']);
+Route::get('/admin/clients', [AdminController::class, 'getClients']);

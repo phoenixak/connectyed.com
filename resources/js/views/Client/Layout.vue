@@ -33,7 +33,7 @@
                 </li>								
                 <li>
                   <a href="#">
-                    <router-link :to="{name:'dashboard'}" class="nav-link">Dashboard</router-link>
+                    <router-link :to="{name:'client'}" class="nav-link">Dashboard</router-link>
                   </a>									
                 </li>																
               </ul>

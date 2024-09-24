@@ -33,26 +33,23 @@ import { faTachometerAlt, faUser, faBriefcase, faUsers, faDollarSign, faEnvelope
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export default {
-components: {
-    FontAwesomeIcon
-},
-data() {
-    return {
-    menuItems: [
-        { title: "Dashboard", icon: faTachometerAlt, link: "/dashboard" },        
-        { title: "My Profile", icon: faUser, link: "/profile" },
-        { title: "My Specialties", icon: faBriefcase, link: "/specialties" },
-        { title: "My Availability", icon: faCalendar, link: "/availability" },
-        { title: "Clients", icon: faUsers, link: "/clients" },
-        { title: "Billing and Subscription", icon: faDollarSign, link: "/billing" },
-        { title: "Communication Tools", icon: faEnvelope, link: "/communication" },
-        { title: "Match Management", icon: faTasks, link: "/match-management" },
-    ]
-    };
-}
+    name:"matchmaker",
+    components: {
+        FontAwesomeIcon
+    },
+    data() {
+        return {
+        menuItems: [
+            { title: "Dashboard", icon: faTachometerAlt, link: "/dashboard" },        
+            { title: "My Profile", icon: faUser, link: "/profile" },
+            { title: "My Specialties", icon: faBriefcase, link: "/specialties" },
+            { title: "My Availability", icon: faCalendar, link: "/availability" },
+            { title: "Clients", icon: faUsers, link: "/clients" },
+            { title: "Billing and Subscription", icon: faDollarSign, link: "/billing" },
+            { title: "Communication Tools", icon: faEnvelope, link: "/communication" },
+            { title: "Match Management", icon: faTasks, link: "/match-management" },
+        ]
+        };
+    }
 };
 </script>
-
-<style>
-/* Tailwind custom styles (optional) */
-</style>

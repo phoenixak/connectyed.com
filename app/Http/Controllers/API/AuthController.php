@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\Specialties;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
@@ -98,6 +100,7 @@ class AuthController extends Controller
             'country' => $request->country,
             'location' => $request->currentLocation,
             'age' => $request->age,
+            'gender' => $request->gender,
             'haircolor' => $request->hairColor,
             'weight' => $request->weight,
             'height' => $request->heightFeet,
@@ -115,6 +118,12 @@ class AuthController extends Controller
             'languages' => $request->languages
         ]);
 
+        if($request->input('ismatchmaker')){
+            $specialties = Specialties::create([
+                'user_id' => $user->id,
+            ]);
+        }
+        
         event(new Registered($user));
 
         return response()->json([

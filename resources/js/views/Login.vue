@@ -66,27 +66,16 @@
                 signIn:'auth/login'
             }),
             async login() {                
-                this.processing = true
-                await axios.post('/api/user/login', this.auth).then(({ data }) => {                        
+                this.processing = true                
+                await axios.post('/api/user/login', this.auth).then(({ data }) => {                                            
                     localStorage.setItem("user", JSON.stringify(data))                    
                     axios.defaults.headers.common.Authorization = `Bearer ${data.authorization.token}`
                     this.signIn()                                        
-                    if (data.data.user.role === 'admin') {
-                        this.$router.push({ name: 'admin' });
-                    } else if (data.data.user.role === 'matchmaker') {
-                        this.$router.push({ name: 'matchmaker' });                        
-                    } else if (data.data.user.role === 'candidate') {
-                        this.$router.push({ name: 'matchmaker' });
-                    } else if (data.data.user.role === 'client') {                       
-                        this.$router.push({ name: 'dashboard' });                        
-                    }
                 }).catch(({response}) => {                    
                     if(response.status===422){
-                        this.validationErrors = response.data.data
-                        //console.log(response)
+                        this.validationErrors = response.data.data                        
                     } else {                                      
-                        this.validationErrors = response.data.data
-                        //console.log("2", response)
+                        this.validationErrors = response.data.data                        
                     }
                 }).finally(()=>{
                     this.processing = false

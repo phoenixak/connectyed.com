@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 use App\Models\User;
 use App\Models\Profile;
-use Illuminate\Support\Facades\DB;
+use App\Models\Availability;
 use Illuminate\Support\Facades\Auth;
 
 use Response;
@@ -36,6 +36,7 @@ class ProfileController extends Controller
         $profile->country = $request->input('profile.country');
         $profile->location = $request->input('profile.location');
         $profile->age = $request->input('profile.age');
+        $profile->gender = $request->input('profile.gender');        
         $profile->haircolor = $request->input('profile.haircolor');
         $profile->weight = $request->input('profile.weight');
         $profile->height = $request->input('profile.height');     
@@ -144,25 +145,37 @@ class ProfileController extends Controller
         $user = Auth::user();
         $userid = $user->id;
         $profile = Profile::with('user')->where('user_id', $userid)->first();
-
+        
         return response()->json([
             "success" => true,
             "data" => $profile,
             "message" => 'Success'
-        ], 200);        
+        ], 200);     
     }  
 
     public function getdetail($username)
     {
-        $profiles = Profile::whereHas('user', function ($query) use ($username) {
+        $profiles = Profile::with(['user.availability' => function ($query) {
+            $query->orderBy('start_date', 'asc')->limit(2);
+        }])
+        ->whereHas('user', function ($query) use ($username) {
             $query->where('username', $username);
-        })->firstOrFail();
-
+        })
+        ->firstOrFail();
+        
+        $profileList = Profile::with('user')->where('matchmaker_id', $profiles->user_id)
+        ->limit(4)
+        ->get();
+        
         return response()->json([
             "success" => true,
-            "data" => $profiles,
+            "data" => $data = [
+                'profile' => $profiles,      
+                'profile_list' => $profileList
+            ],
             "message" => 'Success'
-        ], 200);        
-    }  
+        ], 200);
+              
+    }      
 
 }

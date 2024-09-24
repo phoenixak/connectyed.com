@@ -3,12 +3,7 @@
     <h2 class="text-2xl font-semibold mb-4">Matchmaker Profile</h2>
         
     <!-- Profile Picture -->
-    <div class="mb-4 w-1/4 ">
-      <!-- Image Default -->
-      <div class="flex mb-4">
-        <img v-if="!currentAvatar" src="/upload/images/profiles/default.png" alt="Preview" class="rounded-full object-cover w-48 h-48" />
-      </div> 
-
+    <div class="mb-4 w-1/4 ">      
       <!-- Image Preview -->
       <div class="flex mb-4" v-if="currentAvatar">
         <img :src="currentAvatar" alt="Profile Preview" class="rounded-full object-cover w-48 h-48" />
@@ -108,7 +103,7 @@ export default {
       user:{},
       profile:{},      
       authorization:this.$store.state.auth.authorization,
-      currentAvatar: ''
+      currentAvatar: '/upload/images/profiles/default.png'
     };
   },  
   mounted() {      
@@ -142,8 +137,7 @@ export default {
             'Content-Type': 'multipart/form-data'
         }
         })
-          .then((response) => {            
-            console.log("response.data.data", response.data.data)
+          .then((response) => {                        
             this.currentAvatar = response.data.data              
         }).catch((error)=>{
             console.error(error);

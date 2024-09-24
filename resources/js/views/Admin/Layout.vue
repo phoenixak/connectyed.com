@@ -14,10 +14,9 @@
         </div>
       </div>
     </div>
-    <div class="header__bottom">
-      <div class="container">
+    <div class="header bg-[#213366]">      
         <nav class="navbar navbar-expand-lg">
-          <a class="navbar-brand" href="#"><h2><router-link :to="{name:'home'}" class="nav-link"><img src="assets/images/logo/connectyedlogo.png" alt="Connectyed Logo" class="w-[70px]"></router-link></h2></a>
+          <a class="navbar-brand" href="#"><h2><router-link :to="{name:'home'}" class="nav-link"><img src="/assets/images/logo/connectyedlogo.png" alt="Connectyed Logo" class="w-[70px]"></router-link></h2></a>
           <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
             aria-label="Toggle navigation">
@@ -33,7 +32,7 @@
                 </li>								
                 <li>
                   <a href="#">
-                    <router-link :to="{name:'dashboard'}" class="nav-link">Dashboard</router-link>
+                    <router-link :to="{name:'admin'}" class="nav-link">Dashboard</router-link>
                   </a>									
                 </li>																
               </ul>
@@ -49,8 +48,7 @@
               <a @click="logout" href="javascript:void(0)" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-light py-4 px-5" aria-current="page" v-if="!!user.user.name">Logout</a>
             </div>
           </div>
-        </nav>
-      </div>
+        </nav>      
     </div>
     </header>
     <!-- ================> header section end here <================== -->
@@ -60,49 +58,7 @@
   
   
     <!-- ================> Footer section start here <================== -->
-  <footer class="footer footer--style2">
-    <div class="footer__top bg_img">
-      <div class="footer__newsletter wow fadeInUp" data-wow-duration="1.5s">
-        <div class="container">
-          <div class="row g-4 justify-content-center">
-            <div class="col-lg-6 col-12">
-              <div class="footer__newsletter--area">
-                <div class="footer__newsletter--title">
-                  <h4>Newsletter Sign up</h4>
-                </div>
-                <div class="footer__newsletter--form">
-                  <form action="#">
-                    <input type="email" placeholder="Your email address">
-                    <button type="submit" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-light py-3 px-4 right-1 top-1 absolute"><span>Subscribe</span></button>
-                  </form>
-                </div>
-              </div>
-            </div>            
-          </div>
-        </div>
-      </div>
-      <div class="footer__toparea padding-top padding-bottom wow fadeInUp" data-wow-duration="1.5s">
-        <div class="container">
-          <div class="row g-4">
-            <div class="col-lg-3 col-sm-6 col-12">
-              <div class="footer__item footer--about">
-                <div class="footer__inner">
-                  <div class="footer__content">
-            <div class="footer__content--title">
-              <h4>About Connectyed</h4>
-            </div>
-              <div class="footer__content--desc">
-                <p>Connectyed is a matchmaking platform that connects people with ideal partners using advanced technology and expert matchmakers. Whether for friendship, love, or networking, we offer a trusted and easy-to-use service.</p>
-              </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
+  <footer class="footer footer--style2">        
     <div class="footer__bottom wow fadeInUp" data-wow-duration="1.5s">
       <div class="container">
         <div class="footer__content text-center">

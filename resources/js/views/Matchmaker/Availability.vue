@@ -1,124 +1,170 @@
 <template>
-    <div class="min-h-screen bg-gray-100 p-6">
-      <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-lg p-8">
-        <h2 class="text-3xl font-semibold mb-6">Set Your Availability</h2>
-  
-        <!-- VueCal Calendar -->
-        <vue-cal
-          v-model="events"
-          :time="true"
-          default-view="week"
-          :on-event-click="editEvent"
-          @cell-click="addEvent"
-          class="bg-white border rounded-lg shadow-sm"
-          style="height: 600px;"
-        ></vue-cal>
-  
-        <!-- Add/Edit Event Modal -->
-        <div v-if="showModal" class="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
-          <div class="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg">
-            <h3 class="text-2xl font-semibold mb-4">{{ modalAction }} Availability</h3>
-  
-            <!-- Event Title -->
-            <label class="block text-sm mb-2">Availability Description</label>
-            <input
-              type="text"
-              v-model="currentEvent.title"
-              class="block w-full p-2 border rounded-lg mb-4"
-              placeholder="Enter description (e.g., 'Available for consultations')"
-            />
-  
-            <!-- Event Time (Start/End) -->
-            <label class="block text-sm mb-2">Start Time</label>
-            <input
-              type="datetime-local"
-              v-model="currentEvent.start"
-              class="block w-full p-2 border rounded-lg mb-4"
-            />
-  
-            <label class="block text-sm mb-2">End Time</label>
-            <input
-              type="datetime-local"
-              v-model="currentEvent.end"
-              class="block w-full p-2 border rounded-lg mb-4"
-            />
-  
-            <!-- Modal Buttons -->
-            <div class="flex justify-end space-x-2">
-              <button @click="saveEvent" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
-                Save
-              </button>
-              <button @click="cancelEvent" class="bg-gray-300 px-4 py-2 rounded-lg">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+  <div class="max-w-7xl mx-auto p-6 bg-white rounded-sm shadow-xs">
+    <h2 class="text-xl font-bold mb-4">Create Date Availability</h2>
+
+    <!-- Multiple Date Selection -->
+    <div class="mb-4">
+      <label class="block text-gray-700 font-bold mb-2">Select Dates:</label>
+      <div v-for="(date, index) in selectedDates" :key="index" class="flex items-center space-x-2 mb-2">
+        <input
+          type="date"
+          class="border border-gray-300 rounded p-2"
+          v-model="selectedDates[index].start_date"
+        />
+        <input
+          type="time"
+          class="border border-gray-300 rounded p-2"
+          v-model="selectedDates[index].start_time"
+        />
+        <input
+          type="time"
+          class="border border-gray-300 rounded p-2"
+          v-model="selectedDates[index].end_time"
+        />
+        <button class="text-red-500 hover:text-red-700" @click="removeDate(index)">Remove</button>
+      </div>
+      <button @click="addNewDate" class="bg-blue-500 text-white font-bold py-2 px-4 rounded">
+        Add Another Date
+      </button>
+    </div>
+
+    <!-- Date Range Selection -->
+    <div class="mb-4">
+      <label class="block text-gray-700 font-bold mb-2">Select Date Range:</label>
+      <div class="flex items-center space-x-2">
+        <input type="date" class="border border-gray-300 rounded p-2" v-model="rangeStart" />
+        <span>to</span>
+        <input type="date" class="border border-gray-300 rounded p-2" v-model="rangeEnd" />
       </div>
     </div>
-  </template>
-  
-  <script>
-  import VueCal from 'vue-cal';
-  import 'vue-cal/dist/vuecal.css';
-  
-  export default {
-    components: {
-      VueCal
+
+    <!-- Submit Button -->
+    <button
+      class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded float-right"
+      @click="submitAvailability"
+    >
+      Save Availability
+    </button>
+  </div>
+
+
+  <div class="max-w-7xl mx-auto p-6 bg-white rounded-sm shadow-xs">
+    <h2 class="text-xl font-bold mb-4">Availability List</h2>
+
+
+    <table class="display w-full max-w-7xl bg-white border border-gray-200 rounded-lg shadow-md">
+    <thead>
+        <tr class="border-b bg-gray-100">
+          <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+          <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
+          <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colspan="2">Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-if="listAvailabilities.length" v-for="(availability, index) in listAvailabilities" :key="index"  class="border-b">
+            <td class="px-1 py-3 whitespace-nowrap"><p v-if="availability.start_date">{{ formatDate(availability.start_date) }}</p></td>
+            <td class="px-1 py-3 whitespace-nowrap"><p v-if="availability.end_date">{{ formatDate(availability.end_date) }}</p></td>
+            <td class="px-1 py-3 whitespace-nowrap"><p v-if="availability.start_time && availability.end_time">Time:{{ formatTime(availability.start_time) }} to {{ formatTime(availability.end_time) }}</p>
+              <p v-else></p>
+            </td>
+            <td class="px-1 py-3 whitespace-nowrap"><button class="text-red-500 hover:text-red-700" @click="removeAvailability(index)">Remove</button></td>
+        </tr>
+      </tbody>
+  </table>
+
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      user: this.$store.state.auth.user.user,
+      authorization: this.$store.state.auth.authorization,
+      processing: false,
+      selectedDates: [{ start_date: '', start_time: '', end_time: '' }],
+      rangeStart: '',
+      rangeEnd: '',
+      listAvailabilities: [],
+    };
+  },
+  methods: {
+    addNewDate() {
+      this.selectedDates.push({ start_date: '', start_time: '', end_time: '' });
     },
-    data() {
-      return {
-        events: [], // Array to store availability events
-        showModal: false, // Boolean to show or hide modal
-        modalAction: 'Add', // Tracks whether the modal is adding or editing
-        currentEvent: {
-          id: null,
-          title: '',
-          start: '',
-          end: ''
-        }
-      };
+    removeDate(index) {
+      this.selectedDates.splice(index, 1);
     },
-    methods: {
-      // Add new availability event
-      addEvent({ date }) {
-        this.showModal = true;
-        this.modalAction = 'Add';
-        this.currentEvent = { title: '', start: date, end: date };
-      },
-  
-      // Edit existing availability event
-      editEvent(event) {
-        this.showModal = true;
-        this.modalAction = 'Edit';
-        this.currentEvent = { ...event };
-      },
-  
-      // Save event (add or edit)
-      saveEvent() {
-        if (this.modalAction === 'Add') {
-          this.currentEvent.id = Math.random().toString(36).substr(2, 9); // Generate a unique ID
-          this.events.push(this.currentEvent); // Add event to the array
-        } else {
-          const index = this.events.findIndex(e => e.id === this.currentEvent.id);
-          if (index !== -1) {
-            this.events.splice(index, 1, this.currentEvent); // Edit event
-          }
+    removeAvailability() {
+      console.log("remove availability")
+    },
+    async submitAvailability() {                   
+      this.processing = true
+      //selectedDates
+      let availabilities = []
+      if (!!this.selectedDates[0].start_date) {        
+        availabilities = this.selectedDates.map(date => ({
+          start_date: date.start_date,
+          start_time: date.start_time,
+          end_time: date.end_time,
+        }));
+
+        // If rangeStart and rangeEnd are selected, push to availabilities array
+        if (this.rangeStart && this.rangeEnd) {
+          availabilities.push({
+            start_date: this.rangeStart,
+            end_date: this.rangeEnd,
+            start_time: null,
+            end_time: null,
+          });
+        }        
+      } else {
+        // If rangeStart and rangeEnd are selected, push to availabilities array
+        if (this.rangeStart && this.rangeEnd) {
+          availabilities = [{
+            start_date: this.rangeStart,
+            end_date: this.rangeEnd,
+            start_time: null,
+            end_time: null,
+          }];
         }
-        this.showModal = false;
-      },
-  
-      // Cancel event action
-      cancelEvent() {
-        this.showModal = false;
+        console.log("startdate not selected", this.selectedDates)
       }
-    }
-  };
-  </script>
-  
-  <style scoped>
-  .bg-smoke-light {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  </style>
-  
+                
+        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`         
+        await axios.post('/api/availabilities', {                
+          user_id: this.user.id, 
+          availabilities,          
+        })
+        .then(({data})=>{                
+          alert('Availability saved successfully!');
+          this.selectedDates = [{ start_date: '', start_time: '', end_time: '' }];
+          this.fetchAvailabilities();
+        }).catch((error)=>{
+            console.error(error);
+        }).finally(()=>{
+            this.processing = false
+        })
+    },    
+    formatDate(date) {
+      return new Date(date).toLocaleDateString();
+    },
+    formatTime(time) {
+      return new Date(`1970-01-01T${time}Z`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
+    async fetchAvailabilities() {
+      try {
+        const response = await axios.get(`/api/availabilities/`+this.user.id); // Replace '1' with the actual matchmaker ID
+        this.listAvailabilities = response.data.data;
+      } catch (error) {
+        console.error('Error fetching availabilities:', error);
+      }
+    },
+  },
+  created() {
+    this.fetchAvailabilities();
+  },
+};
+</script>

@@ -15,69 +15,99 @@
     <!-- Add Client Form -->
     <div v-if="showAddClientForm" class="mb-10">
       <h3 class="text-xl font-semibold mb-4">Add New Client</h3>
-      <form @submit.prevent="addClient" enctype="multipart/form-data">
-        <!-- Name -->
-        <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2">Name</label>
-          <input
-            v-model="newClient.name"
-            type="text"
-            placeholder="Enter client's name"
-            class="w-full py-2 px-4 text-gray-700 border rounded-lg focus:outline-none focus:ring"
-          />
-        </div>
 
-        <!-- Email -->
-        <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2">Email</label>
-          <input
-            v-model="newClient.email"
-            type="email"
-            placeholder="Enter client's email"
-            class="w-full py-2 px-4 text-gray-700 border rounded-lg focus:outline-none focus:ring"
-          />
-        </div>
 
-        <!-- Age -->
+      <form @submit.prevent="addClient" enctype="multipart/form-data"> 
+        <div class="mb-1" v-if="Object.keys(validationErrors).length > 0">
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    <li class="text-red-500 text-xs italic" v-for="(value, key) in validationErrors" :key="key">{{ value[0] }}</li>
+                </ul>
+            </div>
+        </div>                       
+        <!-- Step 1: Account Information -->        
         <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2">Age</label>
-          <input
-            v-model="newClient.age"
-            type="number"
-            placeholder="Enter client's age"
-            class="w-full py-2 px-4 text-gray-700 border rounded-lg focus:outline-none focus:ring"
-          />
+          <div v-if="preview" class="mb-4">
+            <img :src="preview" alt="Image Preview" class="w-48 h-48 object-cover rounded-md shadow-lg" />
+          </div>
+          <label for="avatar" class="block text-gray-700">Upload Image</label>
+          <input @change="onFileChange" id="avatar" type="file" 
+          accept="image/jpeg, image/png, image/jpg, image/gif, image/svg+xml"
+          class="mt-2 block w-full text-sm text-gray-500
+                 file:mr-4 file:py-2 file:px-4
+                 file:rounded-md file:border-0
+                 file:text-sm file:font-semibold
+                 file:bg-blue-50 file:text-blue-700
+                 hover:file:bg-blue-100" />
         </div>
-
-        <!-- Location -->
-        <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2">Location</label>
-          <input
-            v-model="newClient.location"
-            type="text"
-            placeholder="Enter client's location"
-            class="w-full py-2 px-4 text-gray-700 border rounded-lg focus:outline-none focus:ring"
-          />
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+        <input-text label="Name" v-model="newClient.name" :required="true" :error="!!errors.name"
+        :errorMessage="errors.name"/>        
+        <input-text label="Email" v-model="newClient.email" :required="true" :error="!!errors.email"
+        :errorMessage="errors.email"/>        
+        </div>                               
+        <!-- Step 2: Location Details -->        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+        <input-text label="City" v-model="newClient.city" :required="true" :error="!!errors.city"
+        :errorMessage="errors.city"/>
+        <input-text label="State" v-model="newClient.state" :required="true" :error="!!errors.state"
+        :errorMessage="errors.state"/>
+        <select-option label="Country" :options="countries" v-model="newClient.country" :required="true" :error="!!errors.country"
+        :errorMessage="errors.country"/>
+        <input-text label="Current Location (City)" v-model="newClient.currentLocation" :required="true" :error="!!errors.currentLocation"
+        :errorMessage="errors.currentLocation"/>
+        </div>   
+        <!-- Step 3: Personal Information -->        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+        <input-text label="Age" v-model="newClient.age" :required="true" :error="!!errors.age"
+        :errorMessage="errors.age"/>
+        <input-text label="Hair Color" v-model="newClient.hairColor" :required="true" :error="!!errors.hairColor"
+        :errorMessage="errors.hairColor"/>
+        <input-text label="Weight (lbs)" v-model="newClient.weight" :required="true" :error="!!errors.weight"
+        :errorMessage="errors.weight"/>
+        <div class="flex gap-4">
+            <input-text label="Height (Feet)" v-model="newClient.heightFeet" :required="true" :error="!!errors.heightFeet"
+            :errorMessage="errors.heightFeet"/>
+            <input-text label="Inches" v-model="newClient.heightInches" :required="true" :error="!!errors.heightInches"
+            :errorMessage="errors.heightInches"/>
         </div>
-
-        <!-- Profile Picture Upload -->
-        <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2">Profile Picture</label>
-          <input
-            type="file"
-            @change="handleFileUpload"
-            class="w-full py-2 px-4 text-gray-700 border rounded-lg focus:outline-none focus:ring"
-          />
         </div>
+        <!-- Step 4: Lifestyle Information -->        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+        <select-option label="Marital Status" :options="maritalStatuses" v-model="newClient.maritalStatus" :required="true"/>
+        <select-option label="Children" :options="childrenOptions" v-model="newClient.children" :required="true"/>
+        <select-option label="Religion" :options="religions" v-model="newClient.religion" :required="true"/>
+        <select-option label="Smoker" :options="yesNoOptions" v-model="newClient.smoker" :required="true"/>
+        <select-option label="Drinker" :options="drinkerOptions" v-model="newClient.drinker" :required="true"/>
+        </div>
+        <!-- Step 5: Professional and Hobbies -->        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+        <input-text label="Education" v-model="newClient.education" :required="true" :error="!!errors.education"
+        :errorMessage="errors.education"/>
+        <input-text label="Job Title" v-model="newClient.jobTitle" :required="true" :error="!!errors.jobTitle"
+        :errorMessage="errors.jobTitle"/>
+        <input-text label="Sports" v-model="newClient.sports" :required="true" :error="!!errors.sports" :errorMessage="errors.sports"/>
+        <input-text label="Hobbies" v-model="newClient.hobbies" :required="true" :error="!!errors.hobbies"
+        :errorMessage="errors.hobbies"/>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <select-option label="English Level" :options="englishLevels" v-model="newClient.englishLevel" :required="true" :error="!!errors.englishLevel"
+        :errorMessage="errors.englishLevel"/>
+        <input-text label="Languages" v-model="newClient.languages" :required="true" :error="!!errors.languages"
+        :errorMessage="errors.languages"/>
+        </div>              
 
-        <!-- Submit Button -->
-        <button
+        <button          
+          class="bg-connectyed-button-light hover:bg-connectyed-button-hover-light text-connectyed-button-hover-light hover:text-connectyed-button-hover-dark py-2 px-4 rounded float-right"
           type="submit"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Add Client
-        </button>
+          :disabled="processing"
+          @click="addClient"
+          >
+          {{ processing ? "Please wait" : "Save" }}
+          </button>
+          
       </form>
+            
     </div>
 
     <!-- List of Clients -->
@@ -91,17 +121,21 @@
         >
           <!-- Client Image -->
           <img
-            :src="client.image"
+            :src="(client.avatar) ? client.avatar : '/upload/images/profiles/default.png'"
             alt="Client Profile"
             class="w-24 h-24 rounded-full object-cover mr-4"
           />
 
           <!-- Client Details -->
           <div>
-            <h4 class="text-lg font-bold">{{ client.name }}</h4>
-            <p class="text-gray-600">{{ client.email }}</p>
+            <h4 class="text-lg font-bold">
+              <router-link :to="'/' + client.user.username">
+                {{ client.user.name }}
+              </router-link>              
+            </h4>
             <p class="text-gray-500 text-sm">Age: {{ client.age }}</p>
             <p class="text-gray-500 text-sm">Location: {{ client.location }}</p>
+            <p class="text-orange-500 text-sm py-2 cursor-pointer" @click="editClient(client.id)">Edit</p>
           </div>
         </div>
       </div>
@@ -113,51 +147,168 @@
 </template>
 
 <script>
+
+import InputText from '../../components/InputText.vue';
+import SelectOption from '../../components/SelectOption.vue';
+
+
 export default {
+  name:"matchmakerclient",
+  components: {
+    InputText,
+    SelectOption    
+  },
   data() {
-    return {
-      showAddClientForm: false, // Controls the visibility of the Add Client form
+    return {      
+      processing: false,
+      showAddClientForm: false, 
+      user: this.$store.state.auth.user.user,
+      authorization: this.$store.state.auth.authorization,      
       newClient: {
-        name: '',
-        email: '',
-        age: null,
-        location: '',
-        image: null // Holds the uploaded image
+        userId: "",
+        isUpdating: false,
+        name: "",        
+        email: "",        
+        city: "",
+        state: "",
+        country: "",
+        currentLocation: "",
+        age: "",
+        hairColor: "",
+        weight: "",
+        heightFeet: "",
+        heightInches: "",
+        maritalStatus: "",
+        children: "",
+        religion: "",
+        smoker: "",
+        drinker: "",
+        education: "",
+        jobTitle: "",
+        sports: "",
+        hobbies: "",
+        englishLevel: "",
+        languages: "",
+        avatar: null
       },
-      clients: [], // Stores the list of clients
-      clientId: 1 // Dummy client ID generator
+      errors: {
+        userId: "",
+        isUpdating: false,
+        name: '',
+        username: '',
+        email:'',
+        password: '',
+        password_confirmation: '',
+        city: '',
+        state: '',
+        country: '',
+        currentLocation: '',
+        age: '',
+        hairColor: '',
+        weight: '',
+        heightFeet: '',
+        heightInches: '',
+        maritalStatus: '',
+        children: '',
+        religion: '',
+        smoker: '',
+        drinker: '',
+        education: '',
+        jobTitle: '',
+        sports: '',
+        hobbies: '',
+        englishLevel: '',
+        languages: '',
+        avatar: null
+      },      
+      clients: [], 
+      countries: ['United States of America', 'Canada'],
+      maritalStatuses: ['Single', 'Separated', 'Divorced'],
+      childrenOptions: ['0', '1', '2', '3', '4'],
+      religions: ['Buddhism', 'Catholic', 'Christian', 'Confucianism', 'Hinduism', 'Islam', 'Jainism', 'Judaism', 'Shinto', 'Sikhism', 'Taoism', 'Zoroastrianism', 'Other'],
+      yesNoOptions: ['Yes', 'No'],
+      drinkerOptions: ['None', 'Occasionally', 'Often'],
+      englishLevels: ['Beginner', 'Intermediate', 'Proficient'],
+      successMessage: '',
+      validationErrors: {},
+      preview: null,
+      file: null,
     };
   },
   methods: {
-    // Handles file input for the profile picture
-    handleFileUpload(event) {
+    onFileChange(event) {
       const file = event.target.files[0];
+      this.newClient.avatar = file;      
       if (file) {
-        this.newClient.image = URL.createObjectURL(file); // Generate a preview URL
+        this.preview = URL.createObjectURL(file);
+        this.file = file;
+      } else {
+        this.preview = null;
+        this.file = null;
       }
     },
-
-    // Add new client to the list
-    addClient() {
-      if (this.newClient.name && this.newClient.email) {
-        // Add a new client with a unique ID
-        const client = { ...this.newClient, id: this.clientId++ };
-        this.clients.push(client);
-
-        // Clear the form after adding the client
-        this.newClient = {
-          name: '',
-          email: '',
-          age: null,
-          location: '',
-          image: null
-        };
-
-        this.showAddClientForm = false; // Close the form
-      } else {
-        alert('Please fill out all required fields');
-      }
-    }
+    async addClient() {            
+      this.processing = true
+      const profile = this.newClient               
+        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`            
+      await axios.post('/api/matchmaker/clients', profile, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+        })
+        .then(({ data }) => {   
+          console.log("this.newClient.isUpdating", this.newClient.isUpdating) 
+            console.log("data", data)
+            if (data.success) {                            
+              alert('Profile updated successfully');
+              this.showAddClientForm = false
+              this.getClient();
+            } else {              
+              this.validationErrors = data.data
+            }          
+          }).catch(({ response }) => {          
+            if(response.data.success===false){
+                this.validationErrors = response.data.errors
+            }else{
+                this.validationErrors = {}                                
+            }
+        }).finally(()=>{
+            this.processing = false
+        })
+    },
+    async getClient() {            
+      this.processing = true
+      const matchmakerId = this.user.id
+      const profile = this.newClient        
+        await axios.get('/api/matchmaker/clients/'+matchmakerId)
+        .then(({ data }) => {                            
+          this.clients = data.data            
+        }).catch((error)=>{
+            console.error(error);
+        }).finally(()=>{
+            this.processing = false
+        })
+    },
+    async editClient(id) {
+      this.showAddClientForm = !this.showAddClientForm
+      let selectedProfile = this.clients.find(client => client.id === id)      
+      this.newClient = selectedProfile
+      this.newClient.isUpdating = true
+      this.newClient.userId = selectedProfile.user_id
+      this.newClient.children = selectedProfile.children.toString()
+      this.newClient.name = selectedProfile.user.name
+      this.newClient.email = selectedProfile.user.email
+      this.newClient.currentLocation = selectedProfile.location
+      this.newClient.hairColor = selectedProfile.haircolor
+      this.newClient.heightFeet = selectedProfile.height
+      this.newClient.heightInches = selectedProfile.inches
+      this.newClient.jobTitle = selectedProfile.jobtitle
+      this.newClient.englishLevel = selectedProfile.english
+      this.preview = selectedProfile.avatar      
+    }  
+  },
+  created() {
+    this.getClient();
   }
 };
 </script>
