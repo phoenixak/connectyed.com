@@ -27,7 +27,7 @@ export default {
             image: '',
             twitter: '',
             linkedin: '',
-        },
+        }        
       }
     },
     mounted() {
@@ -38,20 +38,21 @@ export default {
             this.processing = true            
             const username = this.$route.params.username
             await axios.get('/api/profile/getdetail/'+username)
-                .then((response) => {              
-                    if (response.data) {
+                .then((response) => {         
+                    if (response.data) {                        
                         const profile = response.data.data.profile
                         this.currentAvatar = profile.avatar
                         this.profile = profile
-                        this.profile.clients = response.data.data.profile_list  
-                        console.log(profile)                                              
+                        this.profile.clients = response.data.data.profile_list ?? []
+                        this.profile.specialties = response.data.data.specialties ?? []
+                        this.profile.parsedLocations = (response.data.data.specialties) ? JSON.parse(response.data.data.specialties.locations) : []
                         this.isMatchmaker = (profile.user.role === 'matchmaker' || profile.user.role === 'candidate') 
-                    } else {
+                    } else {                        
                         this.$router.push({ name: "notfound" });
                     }
                                        
-            }).catch((error)=>{
-                this.$router.push({ name: "notfound" });
+            }).catch((error)=>{                
+                console.log(error)
             }).finally(()=>{
                 this.processing = false
             })

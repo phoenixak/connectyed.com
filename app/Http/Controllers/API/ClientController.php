@@ -16,8 +16,21 @@ class ClientController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['getClientsByMatchmakerId']]);
+        $this->middleware('auth:api', ['except' => ['getClientsByMatchmakerId', 'index']]);
     }   
+
+    public function index()
+    {        
+        $clients = User::whereHas('profile', function ($query) {
+            $query->where('role', 'client'); 
+        })->get(['id', 'name', 'email']);
+                
+        return response()->json([
+            'success' => true,
+            'data' => $clients,
+            'message' => 'Success'
+        ]);
+    }
 
     public function addClients(Request $request)
     {                                 
@@ -74,7 +87,7 @@ class ClientController extends Controller
                 'age' => $request->age,
                 'gender' => $request->gender,
                 'haircolor' => $request->hairColor,
-                'weight' => $request->weight,
+                'bodytype' => $request->bodytype,
                 'height' => $request->heightFeet,
                 'inches' => $request->heightInches,
                 'maritalstatus' => $request->maritalStatus,

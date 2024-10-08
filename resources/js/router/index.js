@@ -13,7 +13,7 @@ const ForgotPassword = () => import('@/components/ForgotPasswordForm.vue')
 const ResetPassword = () => import('@/components/ResetPasswordForm.vue')
 const Unauthorized = () => import('@/views/Unauthorized.vue')
 const NotFound = () => import('@/views/NotFound.vue')
-
+const ZoomCallback = () => import('@/views/ZoomCallback.vue')
 
 
 /*Clients*/
@@ -23,6 +23,7 @@ const ClientOverview = () => import('@/views/Client/Overview.vue')
 const ClientProfile = () => import('@/views/Client/Profile.vue')
 const ClientMessage = () => import('@/views/Client/Message.vue')
 const ClientBilling = () => import('@/views/Client/Billing.vue')
+const ClientCommunication = () => import('@/views/Client/Communication.vue')
 
 /*Matchmaker*/
 const MatchmakerDashboard = () => import('@/views/Matchmaker/Dashboard.vue')
@@ -306,7 +307,11 @@ const routes = [
                     {
                         path: 'billing', 
                         component: ClientBilling
-                    }                                     
+                    },
+                    {
+                        path: 'communication', 
+                        component: ClientCommunication
+                    },
                 ]
 
             }            
@@ -349,6 +354,11 @@ const routes = [
                 }
             }
         ]       
+    },
+    {
+        path: '/zoom/callback',
+        name: 'ZoomCallback',
+        component: ZoomCallback,
     },
 ]
 

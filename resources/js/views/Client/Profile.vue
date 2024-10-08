@@ -92,9 +92,9 @@
                             <div class="flex flex-wrap mb-3">
                                 <div class="w-[50%]">
                                 <label class="text-gray-700 text-md">
-                                    Weight (Kg): 
+                                    Body Type: 
                                 </label>                                        
-                                {{ profile.weight ? profile.weight : 'N/A' }}
+                                {{ profile.bodytype ? profile.bodytype : 'N/A' }}
                                 </div>
                                 <div class="w-[50%]">
                                 <label class="text-gray-700 text-md">
@@ -309,10 +309,21 @@
 
                         <div class="flex flex-wrap -mx-3 mb-6">
                             <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="weight">
-                                    Weight (lbs)
+                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="bodytype">
+                                    Body Type
                                 </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.weight" id="weight" type="text">
+                                <div class="relative">
+                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.bodytype" id="bodytype">
+                                        <option>Slender</option>
+                                        <option>Average</option>
+                                        <option>Athletic</option>
+                                        <option>Curvy</option>
+                                        <option>Big and Beautiful</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">

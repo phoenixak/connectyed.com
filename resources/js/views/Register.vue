@@ -96,8 +96,8 @@
                 :errorMessage="errors.gender"/>
                 <input-text label="Hair Color" v-model="form.hairColor" :required="true" :error="!!errors.hairColor"
                 :errorMessage="errors.hairColor"/>
-                <input-text label="Weight (lbs)" v-model="form.weight" :required="true" :error="!!errors.weight"
-                :errorMessage="errors.weight"/>
+                <select-option label="Body Type" :options="bodyTypes" v-model="form.bodyType" :required="true" :error="!!errors.bodyType"
+                :errorMessage="errors.bodyType"/>
                 <div class="flex gap-4">
                     <input-text label="Height (Feet)" v-model="form.heightFeet" :required="true" :error="!!errors.heightFeet"
                     :errorMessage="errors.heightFeet"/>
@@ -241,7 +241,7 @@ export default {
                 age: "",
                 gender: "",
                 hairColor: "",
-                weight: "",
+                bodyType: "",
                 heightFeet: "",
                 heightInches: "",
                 maritalStatus: "",
@@ -272,7 +272,7 @@ export default {
                 age: '',
                 gender: '',
                 hairColor: '',
-                weight: '',
+                bodyType: '',
                 heightFeet: '',
                 heightInches: '',
                 maritalStatus: '',
@@ -292,6 +292,7 @@ export default {
             errorCount: 0,
             countries: ['United States of America', 'Canada'],
             genders: ['Male', 'Female'],
+            bodyTypes: ['Slender', 'Average', 'Athletic', 'Curvy', 'Big and Beautiful'],
             maritalStatuses: ['Single', 'Separated', 'Divorced'],
             childrenOptions: ['0', '1', '2', '3', '4'],
             religions: ['Buddhism', 'Catholic', 'Christian', 'Confucianism', 'Hinduism', 'Islam', 'Jainism', 'Judaism', 'Shinto', 'Sikhism', 'Taoism', 'Zoroastrianism', 'Other'],
@@ -355,8 +356,8 @@ export default {
                 } else if (this.form.hairColor === '') {
                     this.errors.hairColor = 'Hair Color is required';
                     this.errorCount++;
-                } else if (this.form.weight === '') {
-                    this.errors.weight = 'Weight is required';
+                } else if (this.form.bodyType === '') {
+                    this.errors.bodyType = 'Body Type is required';
                     this.errorCount++;
                 } else if (this.form.heightFeet === '') {
                     this.errors.heightFeet = 'Height in Feet is required';
@@ -440,7 +441,7 @@ export default {
                 age: '',
                 gender: '',
                 hairColor: '',
-                weight: '',
+                bodyType: '',
                 heightFeet: '',
                 heightInches: '',
                 maritalStatus: '',
@@ -477,8 +478,7 @@ export default {
         showPrivacy() {        
             this.modalMode.header = "Privacy Policy"        
             this.pdfUrl = "/upload/pdf/privacypolicy.pdf";
-            this.isModalOpen = true;    
-            console.log("Privacy Policy")                        
+            this.isModalOpen = true;                                      
         },
         showTerm() {        
             this.modalMode.header = "Terms of Use Agreement"                        
@@ -489,10 +489,9 @@ export default {
             this.isModalOpen = false;
             this.pdfUrl = '';
         },
-        async register() {
-            console.log("register")
+        async register() {            
             this.processing = true
-            await axios.post('/api/user/register', this.form).then(response=>{                
+            await axios.post('/api/user/register', this.form).then(response => {                    
                 if (response.data.success === true) {
                     this.successMessage = response.data.message
                     this.validationErrors = {}                                    
@@ -506,8 +505,7 @@ export default {
                 if(response.status===422){
                     this.validationErrors = response.data.errors
                 }else{
-                    this.validationErrors = {}
-                    console.log("response", response)
+                    this.validationErrors = {}                    
                     alert(response.data.message)
                 }
             }).finally(()=>{

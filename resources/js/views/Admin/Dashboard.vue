@@ -34,15 +34,6 @@
         </ul>
       </nav>
 
-      <!-- Logout Button -->
-      <div class="p-4">
-        <button
-          @click="logout"
-          class="w-full text-left px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-md"
-        >
-          <i class="fas fa-sign-out-alt mr-2"></i> Logout
-        </button>
-      </div>
     </aside>
 
     <!-- Main Content Area -->
@@ -63,13 +54,7 @@ export default {
         avatar: 'https://via.placeholder.com/150', // Admin avatar or user profile
       },
     };
-  },
-  methods: {
-    logout() {
-      // Add your logout functionality here
-      console.log('Logging out...');
-    },
-  },
+  }
 };
 </script>
 

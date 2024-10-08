@@ -21,7 +21,7 @@ class Profile extends Model
         'location',
         'age',
         'gender',
-        'weight',
+        'bodytype',
         'height',
         'inches',
         'haircolor',

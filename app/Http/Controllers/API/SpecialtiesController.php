@@ -50,6 +50,19 @@ class SpecialtiesController extends Controller
             "data" => $specialties,
             "message" => 'Success'
         ], 200);
-    }     
+    }
+    
+    public function getSpecialtiesByUsername($username)
+    {
+        $user = Auth::user();
+        $userid = $user->id;
+        $specialties = Specialties::with('user')->where('username', $username)->first();
+        
+        return response()->json([
+            "success" => true,
+            "data" => $specialties,
+            "message" => 'Success'
+        ], 200);
+    }  
 
 }

@@ -48,9 +48,9 @@
                             <div class="flex flex-wrap mb-3">
                                 <div class="w-[50%]">
                                 <label class="text-gray-700 text-md">
-                                    Weight (Kg): 
+                                    Body Type: 
                                 </label>                                        
-                                {{ profile.weight ? profile.weight : 'N/A' }}
+                                {{ profile.bodytype ? profile.bodytype : 'N/A' }}
                                 </div>
                                 <div class="w-[50%]">
                                 <label class="text-gray-700 text-md">
@@ -196,7 +196,7 @@
             currentLocation: '',
             age: '',
             hairColor: '',
-            weight: '',
+            bodytype: '',
             heightFeet: '',
             heightInches: '',
             maritalStatus: '',

@@ -129,8 +129,7 @@ export default {
             start_time: null,
             end_time: null,
           }];
-        }
-        console.log("startdate not selected", this.selectedDates)
+        }        
       }
                 
         axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`         

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\Availability;
+use App\Models\Specialties;
 use Illuminate\Support\Facades\Auth;
 
 use Response;
@@ -38,9 +39,9 @@ class ProfileController extends Controller
         $profile->age = $request->input('profile.age');
         $profile->gender = $request->input('profile.gender');        
         $profile->haircolor = $request->input('profile.haircolor');
-        $profile->weight = $request->input('profile.weight');
+        $profile->bodytype = $request->input('profile.bodytype');
         $profile->height = $request->input('profile.height');     
-        $profile->height = $request->input('profile.inches');     
+        $profile->inches = $request->input('profile.inches');     
         $profile->maritalstatus = $request->input('profile.maritalstatus');
         $profile->children = $request->input('profile.children');
         $profile->religion = $request->input('profile.religion');
@@ -166,12 +167,15 @@ class ProfileController extends Controller
         $profileList = Profile::with('user')->where('matchmaker_id', $profiles->user_id)
         ->limit(4)
         ->get();
-        
+
+        $specialties = Specialties::with('user')->where('user_id', $profiles->user_id)->first();
+        //dd($specialties)
         return response()->json([
             "success" => true,
             "data" => $data = [
                 'profile' => $profiles,      
-                'profile_list' => $profileList
+                'profile_list' => $profileList,
+                'specialties' => $specialties
             ],
             "message" => 'Success'
         ], 200);

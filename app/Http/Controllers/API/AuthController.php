@@ -102,7 +102,7 @@ class AuthController extends Controller
             'age' => $request->age,
             'gender' => $request->gender,
             'haircolor' => $request->hairColor,
-            'weight' => $request->weight,
+            'bodytype' => $request->bodyType,
             'height' => $request->heightFeet,
             'inches' => $request->heightInches,
             'maritalstatus' => $request->maritalStatus,

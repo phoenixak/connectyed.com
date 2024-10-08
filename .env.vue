@@ -1,0 +1,2 @@
+VUE_APP_ZOOM_REDIRECT_URI=https://localhost:8000/zoom/callback
+VUE_APP_ZOOM_CLIENT_ID=ykIzUBmVQgaH4vzDB1rQ

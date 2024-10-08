@@ -7,20 +7,20 @@
             </h4>
             <div class="border-b">
                 <div class="text-center">
-                    <img class="w-full border-4 border-white dark:border-gray-800 mx-auto"
-                    :src="profile.avatar" :alt="profile.name">
-                    
+                    <div class="w-[384px] h-[384px] overflow-hidden bg-gray-400">
+                        <img :src="profile.avatar" :alt="profile.name" class="w-full h-full object-cover">
+                    </div>                    
                 </div>                                      
                 <div class="flex justify-center items-center flex-wrap" v-if="profile.clients.length > 0">
                     <div v-for="client in profile.clients" class="w-[25%]">
-                        <router-link :to="'/' + client.user.username">
+                        <a :href="'/' + client.user.username">
                         <img 
                             class="border-2 border-white dark:border-gray-800 " 
                             :key="client.id"
                             :src="(client.avatar) ? client.avatar : '/upload/images/profiles/default.png'" 
                             :alt="(client.name)">
                                                         
-                        </router-link>
+                        </a>
                     </div>
                 </div>
                  
@@ -38,13 +38,33 @@
             </div>
             <!-- List of Availability -->
             <div class="mt-4">
-                <div class="text-center font-semibold text-lg">Availability</div>
+                <div class="text-center font-bold p-1">Availability</div>
                 <ul class="mt-2 space-y-2">
                 <li v-for="(slot, index) in profile.user.availability" :key="index" class="">
                     <div class="grid grid-cols-1 p-1 text-center">
                         <div class="bg-connectyed-card-light p-1 rounded-md">{{ formatDate(slot.start_date) }} - {{ formatDate(slot.end_date) }}</div>
                         <div v-if="slot.start_time" class="rounded text-center text-sm font-bold">{{ slot.start_time }} - {{ slot.end_time }} </div>
                     </div>
+                </li>
+                </ul>
+            </div>
+
+            <div class="mt-4">
+                <div class="text-center font-bold p-1">Specialties</div>
+                <div class="text-center font-semibold bg-connectyed-card-light p-1 rounded-md">Age Range</div>
+                <p class="text-center">{{ profile.specialties.minage }} - {{ profile.specialties.maxage }} years</p>
+            </div>
+            
+            <div class="mt-4">
+                <div class="text-center font-bold bg-connectyed-card-light p-1 rounded-md">Gender Preferences</div>
+                <p class="text-center">{{ formatGender(profile.specialties.gender) }}</p>
+            </div>
+            
+            <div class="mt-4">
+                <div class="text-center font-bold bg-connectyed-card-light p-1 rounded-md">Locations</div>
+                <ul class="list-disc list-inside">
+                <li class="text-center" v-for="location in profile.parsedLocations" :key="location.id">
+                    {{ location.name }} ({{ location.category }})
                 </li>
                 </ul>
             </div>
@@ -70,6 +90,14 @@
         formatDate(date) {                    
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return new Date(date).toLocaleDateString(undefined, options);
+        },
+        formatGender(gender) {
+            const genders = {
+                'male': 'Male',
+                'female': 'Female',
+                'male_female': 'Male & Female'
+            };
+            return genders[gender] || gender;
         }
     }
   };

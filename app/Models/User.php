@@ -85,20 +85,22 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {        
         return $this->hasMany(Availability::class);
     }
-
-    // public static function boot()
-    // {
-    //     parent::boot();
-
-    //     self::created(function ($model) {
-    //         $profile = new Profile();
-    //         $model->profile()->save($profile);
-    //     });
-    // }
-    
+   
     public function sendEmailVerificationNotification()
     {
         $this->notify(new CustomVerifyEmail);
+    }
+
+    // A user can attend many meetings as a client
+    public function meetingsAsClient()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_client', 'client_id', 'meeting_id');
+    }
+
+    // A user (matchmaker) can host many meetings
+    public function hostedMeetings()
+    {
+        return $this->hasMany(Meeting::class, 'matchmaker_id');
     }
 
 }

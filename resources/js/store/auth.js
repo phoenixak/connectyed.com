@@ -47,8 +47,7 @@ export default {
                 commit('SET_USER', localUser.data)
                 commit('SET_AUTHENTICATED',true)
                 commit('SET_TOKEN', localUser.authorization)
-                commit('SET_USER_ROLE', localUser.data.user.role)   
-                console.log("localUser.data.user.role", localUser.data.user.role)
+                commit('SET_USER_ROLE', localUser.data.user.role)                   
                 if (localUser.data.user.role === 'admin') {
                     router.push({ path: 'admin/dashboard' });
                 } else if (localUser.data.user.role === 'matchmaker') {

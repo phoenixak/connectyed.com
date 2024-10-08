@@ -63,8 +63,7 @@
         :errorMessage="errors.age"/>
         <input-text label="Hair Color" v-model="newClient.hairColor" :required="true" :error="!!errors.hairColor"
         :errorMessage="errors.hairColor"/>
-        <input-text label="Weight (lbs)" v-model="newClient.weight" :required="true" :error="!!errors.weight"
-        :errorMessage="errors.weight"/>
+        <select-option label="Body Type" :options="bodyTypes" v-model="newClient.bodytype" :required="true"/>
         <div class="flex gap-4">
             <input-text label="Height (Feet)" v-model="newClient.heightFeet" :required="true" :error="!!errors.heightFeet"
             :errorMessage="errors.heightFeet"/>
@@ -175,7 +174,7 @@ export default {
         currentLocation: "",
         age: "",
         hairColor: "",
-        weight: "",
+        bodytype: "",
         heightFeet: "",
         heightInches: "",
         maritalStatus: "",
@@ -205,7 +204,7 @@ export default {
         currentLocation: '',
         age: '',
         hairColor: '',
-        weight: '',
+        bodytype: '',
         heightFeet: '',
         heightInches: '',
         maritalStatus: '',
@@ -223,6 +222,7 @@ export default {
       },      
       clients: [], 
       countries: ['United States of America', 'Canada'],
+      bodyTypes: ['Slender', 'Average', 'Athletic', 'Curvy', 'Big and Beautiful'],
       maritalStatuses: ['Single', 'Separated', 'Divorced'],
       childrenOptions: ['0', '1', '2', '3', '4'],
       religions: ['Buddhism', 'Catholic', 'Christian', 'Confucianism', 'Hinduism', 'Islam', 'Jainism', 'Judaism', 'Shinto', 'Sikhism', 'Taoism', 'Zoroastrianism', 'Other'],
@@ -256,9 +256,7 @@ export default {
             'Content-Type': 'multipart/form-data'
         }
         })
-        .then(({ data }) => {   
-          console.log("this.newClient.isUpdating", this.newClient.isUpdating) 
-            console.log("data", data)
+        .then(({ data }) => {                         
             if (data.success) {                            
               alert('Profile updated successfully');
               this.showAddClientForm = false

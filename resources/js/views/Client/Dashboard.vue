@@ -13,7 +13,7 @@
                 class="w-12 h-12 rounded-full object-cover mr-3"
               />
               <div>
-                <h2 class="text-lg font-semibold text-connectyed-button-light">{{ profile.name }}</h2>
+                <h2 class="text-lg font-semibold text-connectyed-button-light">{{ user.name }}</h2>
                 <p class="text-sm text-[#e7dccf]">Client</p>
               </div>
             </div>
@@ -33,15 +33,6 @@
               </ul>                    
             </nav>
       
-            <!-- Logout Button -->
-            <div class="p-4">
-              <button
-                @click="logout"
-                class="w-full text-left px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-md"
-              >
-                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-              </button>
-            </div>
           </aside>
       
           <!-- Main Content Area -->
@@ -64,15 +55,14 @@ export default {
     },
     data() {
       return {
-        profile: {
-          name: 'Jane Smith',
-          avatar: 'https://via.placeholder.com/150', // Replace with the user's avatar URL
-        },
+        user: this.$store.state.auth.user.user,
+        profile:this.$store.state.auth.user.profile,
+        authorization:this.$store.state.auth.authorization,        
         menuItems: [
             { title: "Dashboard", icon: faTachometerAlt, link: "/dashboard" },        
             { title: "My Profile", icon: faUser, link: "/profile" },           
             { title: "Billing and Subscription", icon: faDollarSign, link: "/billing" },
-            { title: "Message", icon: faEnvelope, link: "/message" },            
+            { title: "Communication", icon: faEnvelope, link: "/communication" },            
         ]
         };
     }

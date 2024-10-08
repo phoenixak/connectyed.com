@@ -42,8 +42,7 @@ export default {
         this.processing = true
         axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
         await axios.get('/api/admin/clients')
-          .then((response) => {          
-            console.log("response.data.data", response)                             
+          .then((response) => {                                              
             this.clients = response.data.data;
         }).catch((error)=>{
             console.error(error);
