@@ -1,104 +1,257 @@
+# ProfileCard.vue
 <template>
-    <div class="dark:bg-gray-700 bg-gray-200 pt-12">
-    <!-- Card start -->
-        <div class="max-w-sm mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-sm">
-            <h4 class="p-2 uppercase text-center text-sm text-gray-600 dark:text-white mb-1">
-                {{ profile.user.name }}
-            </h4>
-            <div class="border-b">
-                <div class="text-center">
-                    <div class="w-[384px] h-[384px] overflow-hidden bg-gray-400">
-                        <img :src="profile.avatar" :alt="profile.name" class="w-full h-full object-cover">
-                    </div>                    
-                </div>                                      
-                <div class="flex justify-center items-center flex-wrap" v-if="profile.clients.length > 0">
-                    <div v-for="client in profile.clients" class="w-[25%]">
-                        <a :href="'/' + client.user.username">
-                        <img 
-                            class="border-2 border-white dark:border-gray-800 " 
-                            :key="client.id"
-                            :src="(client.avatar) ? client.avatar : '/upload/images/profiles/default.png'" 
-                            :alt="(client.name)">
-                                                        
-                        </a>
-                    </div>
-                </div>
-                 
-          
-                <div class="py-2 flex justify-center items-center f">                    
-                    <div class="inline-flex text-gray-700 dark:text-gray-300 items-center">
-                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-600 mr-1" fill="currentColor"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                            <path class=""
-                                d="M5.64 16.36a9 9 0 1 1 12.72 0l-5.65 5.66a1 1 0 0 1-1.42 0l-5.65-5.66zm11.31-1.41a7 7 0 1 0-9.9 0L12 19.9l4.95-4.95zM12 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-                        </svg>
-                        {{ profile.location }}
-                    </div>
-                </div>                
-            </div>
-            <!-- List of Availability -->
-            <div class="mt-4">
-                <div class="text-center font-bold p-1">Availability</div>
-                <ul class="mt-2 space-y-2">
-                <li v-for="(slot, index) in profile.user.availability" :key="index" class="">
-                    <div class="grid grid-cols-1 p-1 text-center">
-                        <div class="bg-connectyed-card-light p-1 rounded-md">{{ formatDate(slot.start_date) }} - {{ formatDate(slot.end_date) }}</div>
-                        <div v-if="slot.start_time" class="rounded text-center text-sm font-bold">{{ slot.start_time }} - {{ slot.end_time }} </div>
-                    </div>
-                </li>
-                </ul>
-            </div>
+  <div class="profile-card bg-white rounded-lg shadow-lg overflow-hidden">
+    <!-- Profile Picture -->
+    <div class="profile-image w-full h-56 overflow-hidden">
+      <img 
+        :src="profileImage" 
+        :alt="matchmaker.name"
+        class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+      />
+    </div>
 
-            <div class="mt-4">
-                <div class="text-center font-bold p-1">Specialties</div>
-                <div class="text-center font-semibold bg-connectyed-card-light p-1 rounded-md">Age Range</div>
-                <p class="text-center">{{ profile.specialties.minage }} - {{ profile.specialties.maxage }} years</p>
+    <!-- Matchmaker Info -->
+    <div class="profile-info p-4">
+      <h3 class="text-xl font-semibold text-gray-800 mb-2 truncate">{{ matchmaker.name }}</h3>
+      
+      <div class="info-grid mb-3">
+        <!-- Location -->
+        <p v-if="location" class="flex items-center text-sm">
+          <span class="font-medium mr-2">📍</span>
+          <span class="truncate">{{ location }}</span>
+        </p>
+
+        <!-- Age -->
+        <p v-if="matchmaker.profile?.age" class="flex items-center text-sm">
+          <span class="font-medium mr-2">Age:</span>
+          {{ matchmaker.profile.age }}
+        </p>
+
+        <!-- Experience -->
+        <p v-if="matchmaker.profile?.yearsexperience" class="flex items-center text-sm">
+          <span class="font-medium mr-2">Experience:</span>
+          {{ matchmaker.profile.yearsexperience }} years
+        </p>
+      </div>
+
+      <!-- Bio -->
+      <div class="bio-section mb-3">
+        <p v-if="matchmaker.profile?.bio" class="text-sm text-gray-600" :class="{ 'line-clamp-3': !expandBio }">
+          {{ matchmaker.profile.bio }}
+        </p>
+        <button 
+          v-if="hasLongBio" 
+          @click="expandBio = !expandBio"
+          class="text-xs text-blue-500 mt-1 hover:underline"
+        >
+          {{ expandBio ? 'Show Less' : 'Show More' }}
+        </button>
+      </div>
+
+      <!-- Clients Section -->
+      <div v-if="clients.length" class="mb-3">
+        <h4 class="text-sm font-medium text-gray-700 mb-2">Clients</h4>
+        <div class="flex flex-wrap gap-2">
+          <div 
+            v-for="client in displayedClients" 
+            :key="client.id"
+            class="client-thumbnail relative"
+          >
+            <img 
+              :src="client.thumbnail_image || '/upload/images/profiles/default-client-image.png'" 
+              :alt="client.name"
+              class="w-10 h-10 rounded-full object-cover border-2 border-white"
+            />
+            <div class="client-info absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+              {{ client.age }}
             </div>
-            
-            <div class="mt-4">
-                <div class="text-center font-bold bg-connectyed-card-light p-1 rounded-md">Gender Preferences</div>
-                <p class="text-center">{{ formatGender(profile.specialties.gender) }}</p>
-            </div>
-            
-            <div class="mt-4">
-                <div class="text-center font-bold bg-connectyed-card-light p-1 rounded-md">Locations</div>
-                <ul class="list-disc list-inside">
-                <li class="text-center" v-for="location in profile.parsedLocations" :key="location.id">
-                    {{ location.name }} ({{ location.category }})
-                </li>
-                </ul>
-            </div>
-            
+          </div>
         </div>
-    <!-- Card end -->
-    </div>    
+      </div>
+
+      <!-- Availability -->
+      <div v-if="matchmaker.availability?.length" class="availability-section">
+        <h4 class="text-sm font-medium text-gray-700 mb-1">Available Times</h4>
+        <div class="availability-container max-h-20 overflow-y-auto">
+          <div class="text-xs text-gray-600 space-y-1">
+            <p v-for="(slot, index) in limitedAvailability" :key="index" class="line-clamp-1">
+              {{ formatAvailability(slot) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
-  
-  <script>
-  export default {
-    props: {
-      profile: {
-        type: Object,
-        required: true,
-        default: () => ({
-          name: '',                  
-          avatar: '/upload/images/profiles/default.png'
-        }),
-      },
-    },
-    methods: {
-        formatDate(date) {                    
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(date).toLocaleDateString(undefined, options);
-        },
-        formatGender(gender) {
-            const genders = {
-                'male': 'Male',
-                'female': 'Female',
-                'male_female': 'Male & Female'
-            };
-            return genders[gender] || gender;
-        }
+
+<script>
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
+
+export default {
+  name: "ProfileCard",
+  props: {
+    matchmaker: {
+      type: Object,
+      required: true
     }
-  };
-  </script>
+  },
+
+  setup(props) {
+    const clients = ref([])
+    const expandBio = ref(false)
+    const MAX_DISPLAYED_CLIENTS = 6
+
+    const profileImage = computed(() => {
+      return props.matchmaker.profile?.profile_image1 || '/upload/images/profiles/default.png'
+    })
+
+    const location = computed(() => {
+      const profile = props.matchmaker.profile
+      if (!profile) return null
+      
+      const parts = [profile.city, profile.state, profile.country]
+        .filter(Boolean)
+        .join(', ')
+      
+      return parts || 'Location not specified'
+    })
+
+    const hasLongBio = computed(() => {
+      const bio = props.matchmaker.profile?.bio
+      return bio && bio.length > 120 // Reduced threshold to show more bios
+    })
+
+    const displayedClients = computed(() => {
+      return clients.value.slice(0, MAX_DISPLAYED_CLIENTS)
+    })
+
+    const limitedAvailability = computed(() => {
+      return props.matchmaker.availability?.slice(0, 3) || []
+    })
+
+    const formatAvailability = (slot) => {
+      if (!slot.start_date) return 'Schedule not specified'
+
+      const startDate = new Date(slot.start_date).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric'
+      })
+      
+      const startTime = slot.start_time
+        ? new Date(`1970-01-01T${slot.start_time}Z`).toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })
+        : 'All Day'
+
+      return `${startDate} at ${startTime}`
+    }
+
+    const fetchClients = async () => {
+      try {
+        const response = await axios.get(`/api/public/matchmaker/clients/${props.matchmaker.id}`)
+        if (response.data.success) {
+          clients.value = response.data.data
+        }
+      } catch (error) {
+        console.error('Error fetching clients:', error)
+      }
+    }
+
+    onMounted(() => {
+      fetchClients()
+    })
+
+    return {
+      clients,
+      expandBio,
+      hasLongBio,
+      profileImage,
+      location,
+      displayedClients,
+      limitedAvailability,
+      formatAvailability
+    }
+  }
+}
+</script>
+
+<style scoped>
+.profile-card {
+  height: 600px;
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-image {
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.info-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.client-thumbnail {
+  transition: transform 0.2s;
+}
+
+.client-thumbnail:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+/* Scrollbar styling */
+.profile-info::-webkit-scrollbar,
+.availability-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.profile-info::-webkit-scrollbar-track,
+.availability-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profile-info::-webkit-scrollbar-thumb,
+.availability-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Line clamp utility */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Add some breathing room at the bottom of scrollable content */
+.profile-info > :last-child {
+  margin-bottom: 1rem;
+}
+
+/* Ensure bio text wraps properly */
+.bio-section p {
+  white-space: pre-line;
+  word-break: break-word;
+}
+</style>

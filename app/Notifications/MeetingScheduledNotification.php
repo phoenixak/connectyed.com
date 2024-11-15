@@ -10,7 +10,9 @@ use Illuminate\Notifications\Notification;
 class MeetingScheduledNotification extends Notification
 {
     use Queueable;
+
     protected $meeting;
+
     /**
      * Create a new notification instance.
      */
@@ -32,15 +34,12 @@ class MeetingScheduledNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Your Zoom Meeting is Scheduled')
-                    ->greeting('Hello ' . $notifiable->name)
-                    ->line('Your meeting is scheduled.')
-                    ->line('Meeting Topic: ' . $this->meeting->topic)
-                    ->line('Start Time: ' . $this->meeting->start_time)
-                    ->action('Join Meeting', $this->meeting->join_url)
+                    ->subject('Meeting Scheduled Successfully')
+                    ->line('Your meeting has been scheduled.')
+                    ->action('Join Meeting', $this->meeting->google_meet_link)
                     ->line('Thank you for using our application!');
     }
 

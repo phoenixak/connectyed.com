@@ -50,4 +50,3 @@
   <style scoped>
   /* Additional custom styles can be added here if needed */
   </style>
-  

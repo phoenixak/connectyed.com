@@ -1,41 +1,60 @@
 <template>  
   <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 items-center justify-center">
       <div class="mx-full shadow-connectyed rounded-xl bg-connectyed-card-light flex flex-col py-5 px-5 mb-5"> 
-        <div class="card-body">    
-          <p v-if="loading">Verifying your email...</p>
-          <p v-if="message">{{ message }}</p>
+        <div class="card-body text-center">    
+          <div v-if="loading" class="text-lg">
+            <p>Verifying your email...</p>
+          </div>
+          <div v-else>
+            <p :class="{'text-red-600': error, 'text-green-600': !error}">
+              {{ message }}
+            </p>
+          </div>
         </div>
       </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   props: ['verificationUrl'],
   data() {
     return {
       loading: true,
-      message: ''
+      message: '',
+      error: false
     };
   },
-  mounted() {    
-    this.verifyEmail();
+  mounted() {
+    if (this.verificationUrl) {
+      this.verifyEmail();
+    } else {
+      this.error = true;
+      this.message = 'Invalid verification link.';
+      this.loading = false;
+    }
   },
   methods: {
     async verifyEmail() {
-      try {                
-        const response = await fetch(this.verificationUrl);
-
-        if (response.ok) {
-          this.message = 'Your email has been successfully verified!';
+      try {
+        const response = await axios.get(this.verificationUrl);
+        
+        if (response.data.status === 'success') {
+          this.message = response.data.message;
+          this.error = false;
+          
+          // Redirect to login after successful verification
           setTimeout(() => {
-              this.$router.push({ name: "login" });
-          }, 1500);
+            this.$router.push({ name: 'login' });
+          }, 2000);
         } else {
-          this.message = 'Failed to verify your email. Please try again.';
+          throw new Error(response.data.message || 'Verification failed');
         }
       } catch (error) {
-        this.message = 'An error occurred while verifying your email.';
+        this.error = true;
+        this.message = error.response?.data?.message || 'Failed to verify email. Please try again.';
       } finally {
         this.loading = false;
       }

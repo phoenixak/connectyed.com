@@ -1,2 +1,2 @@
-VUE_APP_ZOOM_REDIRECT_URI=https://localhost:8000/zoom/callback
-VUE_APP_ZOOM_CLIENT_ID=ykIzUBmVQgaH4vzDB1rQ
+VUE_APP_ZOOM_REDIRECT_URI=https://www.connectyed.com/zoom/callback
+VUE_APP_ZOOM_CLIENT_ID=SlWvE1kTieYVeGTQnxtxg

@@ -1,642 +1,859 @@
-<template>  
-    
-    <div class="mx-full shadow-connectyed rounded-xl bg-connectyed-card-light flex flex-col py-5 px-5 mb-5">                                                    
-                                                          
-         
-                <div class="grid grid-cols-4 gap-4">
-                    <label class="text-lg font-bold text-gray-900 dark:text-white mb-4 p-2">About your Profile</label>
-                    <span></span>
-                    <span></span>
-                    <button class="bg-connectyed-button-light text-connectyed-button-dark py-3 px-10" @click="isFormVisible = !isFormVisible" v-if="!isFormVisible">Edit Info</button>
-                </div>
+<template>
+    <div class="mx-full shadow-connectyed rounded-xl bg-connectyed-card-light flex flex-col py-5 px-5 mb-5">
+        <div class="grid grid-cols-4 gap-4">
+            <label class="text-lg font-bold text-gray-900 dark:text-white mb-4 p-2">About your Profile</label>
+            <span></span>
+            <span></span>
+            <button
+                class="bg-connectyed-button-light text-connectyed-button-dark py-3 px-10"
+                @click="toggleFormVisibility"
+                v-if="!isFormVisible"
+            >
+                Edit Info
+            </button>
+        </div>
 
-                <div class="main-content" v-if="!isFormVisible">
-                    <div class="flex">
-                        <div class="col-4 p-2">
-                            <div class="flex flex-wrap justify-left cursor-pointer">
-                                <!-- Main Image -->
-                                <div class="w-[270px] h-[360px] overflow-hidden bg-gray-400" v-if="!currentAvatar">
-                                    <img src="upload/images/profiles/default.png" alt="Main Image" class="w-full h-full object-cover">
-                                </div>
+        <!-- Loading State -->
+        <div v-if="!user || !profile" class="text-center my-5">
+            <p class="text-gray-700">Loading user and profile information...</p>
+        </div>
 
-                                <div class="w-[270px] h-[360px] overflow-hidden bg-gray-400" v-if="currentAvatar">
-                                    <img :src="currentAvatar" alt="Main Image" class="w-full h-full object-cover">
-                                </div>
+        <!-- Main Content -->
+        <div class="main-content" v-else>
+            <!-- Profile Display -->
+            <div v-if="!isFormVisible">
+                <div class="flex">
+                    <!-- Profile Images Section -->
+                    <div class="col-4 p-2">
+                        <div class="flex flex-wrap justify-left cursor-pointer">
+                            <!-- Main Image -->
+                            <div class="w-[270px] h-[360px] overflow-hidden bg-gray-400">
+                                <img
+                                    :src="currentAvatar || '/upload/images/profiles/default.png'"
+                                    alt="Main Image"
+                                    class="w-full h-full object-cover"
+                                />
+                            </div>
 
-                                <!-- Thumbnails -->
-                                <div class="flex flex-wrap justify-left gap-1/2">
-                                    <div class="w-[45px] h-[61px] p-1 overflow-hidden" v-for="(image, index) in userImages" :key="index">
-                                        <img :src="image" 
+                            <!-- Thumbnails -->
+                            <div class="flex flex-wrap justify-left gap-2 mt-2">
+                                <div
+                                    class="w-[45px] h-[61px] p-1 overflow-hidden cursor-pointer"
+                                    v-for="(image, index) in profile.additionalImages"
+                                    :key="image" <!-- Ensure unique key -->
+                                >
+                                    <img
+                                        :src="image"
                                         @click="updateAvatar(image)"
-                                        alt="Profile" class="shadow-sm bg-gray-400 w-full h-full object-cover">
-                                    </div>
+                                        alt="Profile Thumbnail"
+                                        class="shadow-sm bg-gray-400 w-full h-full object-cover rounded"
+                                    />
                                 </div>
                             </div>
-                            
-                            <div class="flex w-full my-2">
-                                <!-- File input button -->
-                                <label for="file_upload" class="cursor-pointer w-full flex">
+                        </div>
+
+                        <!-- Upload Image Buttons -->
+                        <div class="flex w-full gap-2 my-2">
+                            <label class="cursor-pointer flex-1">
                                 <span class="text-connectyed-button-dark bg-connectyed-button-light hover:bg-connectyed-button-hover
-                                hover:text-connectyed-button-hover-dark focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2 w-full
-                                justify-center text-center
-                                ">
-                                    Upload Image
+                                    hover:text-connectyed-button-hover-dark focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2 w-full
+                                    block text-center rounded">
+                                    Upload Image 1
                                 </span>
                                 <input
                                     type="file"
-                                    id="file_upload"
                                     class="hidden"
-                                    @change="uploadFile"
+                                    @change="uploadFile($event, 1)"
+                                    accept="image/*"
                                 />
+                            </label>
+
+                            <label class="cursor-pointer flex-1">
+                                <span class="text-connectyed-button-dark bg-connectyed-button-light hover:bg-connectyed-button-hover
+                                    hover:text-connectyed-button-hover-dark focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2 w-full
+                                    block text-center rounded">
+                                    Upload Image 2
+                                </span>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    @change="uploadFile($event, 2)"
+                                    accept="image/*"
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Profile Details Section -->
+                    <div class="col-7">
+                        <!-- User Name -->
+                        <div class="flex flex-wrap mb-1">
+                            <div class="w-full">
+                                <label class="text-gray-700 text-2xl font-semibold">
+                                    {{ profile.name }}
                                 </label>
                             </div>
                         </div>
-                        <div class="col-7">
-                            <div class="flex flex-wrap mb-1">
-                                <div class="w-full">
+
+                        <!-- Location -->
+                        <div class="flex flex-wrap mb-1">
+                            <div class="w-full">
                                 <label class="text-gray-700 text-2xl">
-                                    {{user.name}}
+                                    {{ profile.city || 'Your City' }}, {{ profile.country || 'Your Country' }}
                                 </label>
-                                </div>
                             </div>
-                            <div class="flex flex-wrap mb-1">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-2xl">
-                                    {{ profile.city ? profile.city : 'Your City' }}, {{ profile.country ? profile.country : 'Your Country' }}
-                                </label>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    location: {{ profile.location ? profile.location : 'Your current location / City' }}
-                                </label>
-                                </div>
-                            </div>                                    
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Age: 
-                                </label>                                        
-                                {{ profile.age ? profile.age : 'N/A' }}
-                                </div>
-                            </div>  
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Gender: 
-                                </label>                                        
-                                {{ profile.gender ? profile.gender : 'N/A' }}
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-[50%]">
-                                <label class="text-gray-700 text-md">
-                                    Body Type: 
-                                </label>                                        
-                                {{ profile.bodytype ? profile.bodytype : 'N/A' }}
-                                </div>
-                                <div class="w-[50%]">
-                                <label class="text-gray-700 text-md">
-                                    Height (Feet):
-                                </label>
-                                {{ profile.height ? profile.height+'′' : 'N/A' }}
-                                {{ profile.inches ? profile.inches+'″' : '0″' }}
-                                </div>
-                            </div>                                      
-
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Hair Color: 
-                                </label>                                        
-                                {{ profile.haircolor ? profile.haircolor : 'N/A' }}
-                                </div>
-                            </div>     
-                            
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Marital Status: 
-                                </label>
-                                {{ profile.maritalstatus ? profile.maritalstatus : 'N/A' }}
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Children:
-                                </label>
-                                {{ profile.children ? profile.children : 'N/A' }}
-                                </div>
-                            </div>   
-
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Religion: 
-                                </label>                                        
-                                {{ profile.religion ? profile.religion : 'N/A' }}
-                                </div>
-                            </div>                                     
-
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-[50%]">
-                                <label class="text-gray-700 text-md">
-                                    Smoker: 
-                                </label>                                        
-                                {{ profile.smoker ? profile.smoker : 'N/A' }}
-                                </div>
-                                <div class="w-[50%]">
-                                <label class="text-gray-700 text-md">
-                                    Drinker: 
-                                </label>                                        
-                                {{ profile.drinker ? profile.drinker : 'N/A' }}
-                                </div>
-                            </div> 
-
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Education: 
-                                </label>                                        
-                                {{ profile.education ? profile.education : 'N/A' }}
-                                </div>
-                            </div>
-
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Job TItle: 
-                                </label>                                        
-                                {{ profile.jobtitle ? profile.jobtitle : 'N/A' }}
-                                </div>
-                            </div>                                    
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Sports: 
-                                </label>                                        
-                                {{ profile.sports ? profile.sports : 'N/A' }}
-                                </div>
-                            </div>   
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Hobbies: 
-                                </label>                                        
-                                {{ profile.hobbies ? profile.hobbies : 'N/A' }}
-                                </div>
-                            </div>   
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    English Level: 
-                                </label>                                        
-                                {{ profile.english ? profile.english : 'N/A' }}
-                                </div>
-                            </div>   
-                            <div class="flex flex-wrap mb-3">
-                                <div class="w-full">
-                                <label class="text-gray-700 text-md">
-                                    Languages: 
-                                </label>                                        
-                                {{ profile.languages ? profile.languages : 'N/A' }}
-                                </div>
-                            </div>   
                         </div>
+
+                        <!-- Additional Profile Information -->
+                        <!-- You can expand this section with all the profile details as needed -->
+                        <div class="flex flex-wrap mb-3">
+                            <div class="w-full">
+                                <label class="text-gray-700 text-md font-medium">
+                                    Location:
+                                </label>
+                                <span>{{ profile.location || 'Your current location / City' }}</span>
+                            </div>
+                        </div>
+                        <!-- Repeat similar blocks for other profile details -->
                     </div>
-                    <div class="grid grid-cols-1 px-17 min-h-16">
-                        <label class="text-gray-700 text-md">
-                            Self Description: 
-                        </label> 
-                        {{ profile.description ? profile.description : 'N/A' }}
-                    </div>
-                    <div class="grid grid-cols-1 px-17 min-h-16">
-                        <label class="text-gray-700 text-md">
-                            Comments: 
-                        </label> 
-                        {{ profile.comment ? profile.comment : 'N/A' }}
-                    </div>                          
                 </div>
+            </div>
 
-
-                
-                <div class="main-content" v-if="isFormVisible">
-                    <form class="w-full" action="javascript:void(0)" @submit="postProfile" method="put">
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full px-3 mb-6 md:mb-0">
+            <!-- Edit Form -->
+            <div v-if="isFormVisible">
+                <form class="w-full" @submit.prevent="postProfile" method="put">
+                    <!-- Full Name -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <div class="w-full px-3 mb-6 md:mb-0">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="name">
                                 Full Name
                             </label>
-                            <input class="appearance-none block w-full border border-gray-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" v-model="user.name" id="name">
-                            </div>
+                            <input
+                                class="appearance-none block w-full border border-gray-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                                type="text"
+                                v-model="profile.name"
+                                id="name"
+                                required
+                            />
                         </div>
-                        
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="city">
-                                    City
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.city" id="city" type="text">
-                            </div>
-                            
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="state">
-                                    State
-                                </label>
-                                <div class="relative">
-                                    <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.state" id="state" type="text">
-                                </div>
-                            </div>
-                        </div>                                
+                    </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="country">
-                                    Country
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.country" id="country">
-                                        <option value="United States of America">United States of America</option>                                                
-                                        <option value="Canada">Canada</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full px-3 mb-6 md:mb-0">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="location">
-                                Current location (City)
+                    <!-- City and State -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- City -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="city">
+                                City
                             </label>
-                            <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.location" id="location" type="text">    
-                            </div>                      
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.city"
+                                id="city"
+                                type="text"
+                                required
+                            />
                         </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                        <!-- State -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="state">
+                                State
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.state"
+                                id="state"
+                                type="text"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="country">
+                                Country
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.country"
+                                    id="country"
+                                    required
+                                >
+                                    <option value="">Select Country</option>
+                                    <!-- Dynamic Country Options -->
+                                    <option
+                                        v-for="(country, index) in countries"
+                                        :key="country"
+                                        :value="country"
+                                    >
+                                        {{ country }}
+                                    </option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Location -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <div class="w-full px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="location">
+                                Current Location (City)
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.location"
+                                id="location"
+                                type="text"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Age and Hair Color -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Age -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="age">
                                 Age
                             </label>
-                            <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.age" id="age" type="text">
-                            </div>
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="haircolor">
-                                    Hair Color
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.haircolor" id="haircolor" type="text">
-                            </div>                       
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.age"
+                                id="age"
+                                type="number"
+                                min="0"
+                                required
+                            />
                         </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="gender">
-                                    Gender
+                        <!-- Hair Color -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="haircolor">
+                                Hair Color
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.haircolor"
+                                id="haircolor"
+                                type="text"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="gender">
+                            Gender
+                        </label>
+                        <div class="relative w-full">
+                            <select
+                                class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.gender"
+                                id="gender"
+                                required
+                            >
+                                <option value="">Select Gender</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <!-- Add more gender options if needed -->
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body Type, Height Feet, and Inches -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Body Type -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="bodytype">
+                                Body Type
                             </label>
                             <div class="relative">
-                                <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.gender" id="gender">
-                                    <option>Male</option>
-                                    <option>Female</option>                                            
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.bodytype"
+                                    id="bodytype"
+                                    required
+                                >
+                                    <option value="">Select Body Type</option>
+                                    <option>Slender</option>
+                                    <option>Average</option>
+                                    <option>Athletic</option>
+                                    <option>Curvy</option>
+                                    <option>Big and Beautiful</option>
+                                    <!-- Add more body types if needed -->
                                 </select>
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                </div>
-                            </div>                     
-                        </div>
-
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="bodytype">
-                                    Body Type
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.bodytype" id="bodytype">
-                                        <option>Slender</option>
-                                        <option>Average</option>
-                                        <option>Athletic</option>
-                                        <option>Curvy</option>
-                                        <option>Big and Beautiful</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
-                            
-                            <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="height">
-                                    Height (Feet)
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.height" id="height" placeholder="0" max="8" type="text">
-                            </div>
-
-                            <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="inches">
-                                    Inches
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.inches" id="inches" placeholder="0" max="11" type="text">
-                            </div>
                         </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="maritalstatus">
-                                    Marital Status
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.maritalstatus" id="maritalstatus">
-                                        <option>Single</option>
-                                        <option>Separated</option>
-                                        <option>Divorced</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                        <!-- Height (Feet) -->
+                        <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="height">
+                                Height (Feet)
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.height"
+                                id="height"
+                                placeholder="0"
+                                min="0"
+                                max="8"
+                                type="number"
+                                required
+                            />
+                        </div>
+
+                        <!-- Height (Inches) -->
+                        <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="inches">
+                                Inches
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.inches"
+                                id="inches"
+                                placeholder="0"
+                                min="0"
+                                max="11"
+                                type="number"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Marital Status and Children -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Marital Status -->
+                        <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="maritalstatus">
+                                Marital Status
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.maritalstatus"
+                                    id="maritalstatus"
+                                    required
+                                >
+                                    <option value="">Select Status</option>
+                                    <option>Single</option>
+                                    <option>Separated</option>
+                                    <option>Divorced</option>
+                                    <!-- Add more statuses if needed -->
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
-                            
-                            <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="children">
-                                    Children
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.children" id="children">                                  <option>0</option>
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                        </div>
+
+                        <!-- Children -->
+                        <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="children">
+                                Children
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.children"
+                                    id="children"
+                                    required
+                                >
+                                    <option value="">Select Number</option>
+                                    <option>0</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <!-- Add more numbers if needed -->
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="religion">
-                                    Religion
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.religion" id="religion">                                <option>Baha'i</option>
-                                        <option>Buddhism</option>
-                                        <option>Catholic</option>
-                                        <option>Christian</option>
-                                        <option>Confucianism</option>
-                                        <option>Hinduism</option>
-                                        <option>Islam</option>
-                                        <option>Jainism</option>
-                                        <option>Judaism</option>
-                                        <option>Shinto</option>
-                                        <option>Sikhism</option>
-                                        <option>Taoism</option>
-                                        <option>Zoroastrianism</option>
-                                        <option>Other</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                        <!-- Religion -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="religion">
+                                Religion
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.religion"
+                                    id="religion"
+                                    required
+                                >
+                                    <option value="">Select Religion</option>
+                                    <option>Baha'i</option>
+                                    <option>Buddhism</option>
+                                    <option>Catholic</option>
+                                    <option>Christian</option>
+                                    <option>Confucianism</option>
+                                    <option>Hinduism</option>
+                                    <option>Islam</option>
+                                    <option>Jainism</option>
+                                    <option>Judaism</option>
+                                    <option>Shinto</option>
+                                    <option>Sikhism</option>
+                                    <option>Taoism</option>
+                                    <option>Zoroastrianism</option>
+                                    <option>Other</option>
+                                    <!-- Add more religions if needed -->
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
-
                         </div>
+                    </div>
 
-
-
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="smoker">
-                                    Smoker
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.smoker" id="smoker">
-                                        <option>Yes</option>
-                                        <option>No</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                    <!-- Smoker and Drinker -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Smoker -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="smoker">
+                                Smoker
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.smoker"
+                                    id="smoker"
+                                    required
+                                >
+                                    <option value="">Select Option</option>
+                                    <option :value="true">Yes</option>
+                                    <option :value="false">No</option>
+                                    <!-- Add more options if needed -->
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
-                            
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="drinker">
-                                    Drinker
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.drinker" id="drinker">                                      <option>None</option>
-                                        <option>Occasionally</option>
-                                        <option>Often</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                        </div>
+
+                        <!-- Drinker -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="drinker">
+                                Drinker
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.drinker"
+                                    id="drinker"
+                                    required
+                                >
+                                    <option value="">Select Option</option>
+                                    <option>None</option>
+                                    <option>Occasionally</option>
+                                    <option>Often</option>
+                                    <!-- Add more options if needed -->
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            
-
+                    <!-- Education and Job Title -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Education -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="education">
+                                Education
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.education"
+                                id="education"
+                                type="text"
+                                required
+                            />
                         </div>
 
+                        <!-- Job Title -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="jobtitle">
+                                Job Title
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.jobtitle"
+                                id="jobtitle"
+                                type="text"
+                                required
+                            />
+                        </div>
+                    </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="education">
-                                    Education
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.education" id="education" type="text">
-                            </div>
-                                                                
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="jobtitle">
-                                    Job TItle
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.jobtitle" id="jobtitle" type="text">
-                            </div>
+                    <!-- Sports and Hobbies -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Sports -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="sports">
+                                Sports
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.sports"
+                                id="sports"
+                                type="text"
+                                required
+                            />
                         </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="sports">
-                                    Sports
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.sports" id="sports" type="text">
-                            </div>
-                            
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="hobbies">
-                                    Hobbies
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.hobbies" id="hobbies" type="text">
-                            </div>
+                        <!-- Hobbies -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="hobbies">
+                                Hobbies
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.hobbies"
+                                id="hobbies"
+                                type="text"
+                                required
+                            />
                         </div>
+                    </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="english">
-                                    English Level
-                                </label>
-                                <div class="relative">
-                                    <select class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.english" id="english">                                      <option>Beginner</option>
-                                        <option>Intermediate</option>
-                                        <option>Proficient</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                    </div>
+                    <!-- English Level and Languages -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- English Level -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="english_level">
+                                English Level
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                    v-model="profile.english_level"
+                                    id="english_level"
+                                    required
+                                >
+                                    <option value="">Select Level</option>
+                                    <option>Beginner</option>
+                                    <option>Intermediate</option>
+                                    <option>Proficient</option>
+                                    <!-- Add more levels if needed -->
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                    </svg>
                                 </div>
                             </div>
-                            
-                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="languages">
-                                    Languages
-                                </label>
-                                <input class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.languages" id="languages" type="text">
-                            </div>
                         </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="languages">
-                                    Self Description
-                                </label>
-                                <textarea class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.description" id="description">
-                                </textarea>    
-                            </div>
+                        <!-- Languages -->
+                        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="languages">
+                                Languages
+                            </label>
+                            <input
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.languages"
+                                id="languages"
+                                type="text"
+                                required
+                            />
                         </div>
+                    </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <div class="w-full px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="languages">
-                                    Comment
-                                </label>
-                                <textarea class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.comment" id="comment">
-                                </textarea>    
-                            </div>
+                    <!-- Bio -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <div class="w-full px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="bio">
+                                Bio
+                            </label>
+                            <textarea
+                                class="appearance-none block w-full border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                v-model="profile.bio"
+                                id="bio"
+                                rows="4"
+                                required
+                            ></textarea>
                         </div>
+                    </div>
 
-                        <div class="flex flex-wrap -mx-3 mb-6 justify-center">    
-                            <button type="submit" class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-hover-dark py-3 px-10">SAVE</button>
-                        </div>
-                    </form>
-
-                </div>
-            
-        
-            
-             
+                    <!-- Submit Button -->
+                    <div class="flex flex-wrap -mx-3 mb-6 justify-center">
+                        <button
+                            type="submit"
+                            :disabled="processing"
+                            class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover-light hover:text-connectyed-button-hover-dark py-3 px-10 rounded"
+                        >
+                            {{ processing ? 'Saving...' : 'SAVE' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-
-  </template>
-
+</template>
 <script>
+// Import the countries array from countries.js
+import { countries } from '../../components/countries.js';
+import axios from 'axios';
+
 export default {
-    name:"profile",
-    data(){
-      return {
-        csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        user: this.$store.state.auth.user.user,
-        profile:this.$store.state.auth.user.profile,
-        authorization:this.$store.state.auth.authorization,
-        posts:{},
-        isFormVisible: false,
-        post: {
-            id: null,
-            title: "",
-            content: "",
-            _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+    name: "Profile",
+    data() {
+        return {
+            user: {},
+            profile: {
+                bio: '', // Initialize bio
+                english_level: '', // Initialize english_level
+                // Initialize other fields as needed
+                additionalImages: [], // Ensure additionalImages is initialized
+            },
+            isFormVisible: false,
+            processing: false,
+            currentAvatar: null,
+            authorization: this.$store.state.auth.authorization,
+            countries: countries, // Add the imported countries to data
+        };
+    },
+    computed: {
+        // Access user and profile from Vuex store
+        userFromStore() {
+            return this.$store.getters['auth/user'];
         },
-        postUrl: "",
-        isNew: true,
-        processing: false,
-        userImages: [],        
-        uploadedImages: [],
-        currentAvatar: 'upload/images/profiles/default.png',
-      }
+        profileFromStore() {
+            return this.$store.getters['auth/profile'];
+        },
     },
     mounted() {
-        this.showUserImages();
         this.getProfile();
     },
-    methods: {   
-        async postProfile() {            
-            this.processing = true
-            axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`        
-            await axios.put('/api/profile/update', {                
-                user: this.user,
-                profile: this.profile
-            })
-            .then(({data})=>{                
-                this.isFormVisible = !this.isFormVisible
-                alert('Profile updated successfully');
-            }).catch((error)=>{
-                console.error(error);
-            }).finally(()=>{
-                this.processing = false
-            })
-        },   
-        async showUserImages() {            
-            this.processing = true
-            axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
-            await axios.get('/api/profile/images')
-                .then((response) => {       
-                this.userImages = Object.values(response.data.data);
-            }).catch((error)=>{
-                console.error(error);
-            }).finally(()=>{
-                this.processing = false
-            })
+    methods: {
+        toggleFormVisibility() {
+            this.isFormVisible = !this.isFormVisible;
         },
-        async uploadFile(event) {
+
+        /**
+         * Fetch the user's profile from the backend API.
+         */
+        async getProfile() {
+            this.processing = true;
+            try {
+                axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`;
+                const response = await axios.get('/api/profile/getprofile');
+
+                if (response.data.success) {
+                    // Set profile and user data
+                    this.profile = response.data.data;
+                    this.user = response.data.data.user;
+
+                    // Ensure additionalImages is an array
+                    if (!Array.isArray(this.profile.additionalImages)) {
+                        this.profile.additionalImages = [];
+                    }
+
+                    // Set current avatar
+                    this.currentAvatar = this.profile.profile_image1 || '/upload/images/profiles/default.png';
+
+                    // Update Vuex store with fetched user and profile
+                    this.$store.commit('auth/SET_USER', this.user);
+                    this.$store.commit('auth/SET_PROFILE', this.profile);
+                } else {
+                    alert('Failed to fetch profile data.');
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                alert('Failed to fetch profile.');
+            } finally {
+                this.processing = false;
+            }
+        },
+
+        /**
+         * Submit the updated profile to the backend API.
+         */
+        async postProfile() {
+            this.processing = true;
+            try {
+                axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`;
+                
+                const payload = {
+                    profile: {
+                        ...this.profile,
+                        name: this.profile.name || this.user.name,
+                        bio: this.profile.bio || '',
+                        english_level: this.profile.english_level || '',
+                        // Convert smoker to boolean if it's a string
+                        smoker: typeof this.profile.smoker === 'string' 
+                            ? (this.profile.smoker === 'true' || this.profile.smoker === true) 
+                            : this.profile.smoker,
+                    }
+                };
+
+                const response = await axios.put('/api/profile/updateprofile', payload);
+
+                if (response.data.success) {
+                    // Update profile and user data with the response
+                    this.profile = response.data.data;
+                    this.user = response.data.data.user;
+
+                    // Ensure additionalImages is an array
+                    if (!Array.isArray(this.profile.additionalImages)) {
+                        this.profile.additionalImages = [];
+                    }
+
+                    // Update Vuex store with new data
+                    this.$store.commit('auth/SET_USER', this.user);
+                    this.$store.commit('auth/SET_PROFILE', this.profile);
+
+                    // Update current avatar
+                    this.currentAvatar = this.profile.profile_image1 || '/upload/images/profiles/default.png';
+
+                    this.isFormVisible = false;
+                    alert('Profile updated successfully');
+                } else {
+                    alert('Failed to update profile.');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Failed to update profile. Please try again.');
+            } finally {
+                this.processing = false;
+            }
+        },
+
+        /**
+         * Upload a profile image.
+         * @param {Event} event - The file input change event.
+         * @param {Number} imageNumber - Indicates which image slot to upload (1 or 2).
+         */
+        async uploadFile(event, imageNumber = 1) {
             const file = event.target.files[0];
             if (!file) return;
+
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("user_id", this.user.id);
-            this.processing = true            
-            axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
-            await axios.post('/api/profile/uploadimages', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+            formData.append("image_number", imageNumber);
+
+            this.processing = true;
+            try {
+                axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`;
+                const response = await axios.post('/api/profile/uploadimage', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                if (response.data.success) {
+                    if (imageNumber === 1) {
+                        this.profile.profile_image1 = response.data.data;
+                        this.currentAvatar = response.data.data;
+                    } else if (imageNumber === 2) {
+                        // Assuming you have a separate field for the second image
+                        if (!this.profile.additionalImages) {
+                            this.profile.additionalImages = [];
+                        }
+                        this.profile.additionalImages.push(response.data.data);
+                    }
+                    // Update Vuex store with the new profile
+                    this.$store.commit('auth/SET_PROFILE', this.profile);
+                    alert('Image uploaded successfully');
+                } else {
+                    alert('Failed to upload image.');
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Failed to upload image.');
+            } finally {
+                this.processing = false;
             }
-            })
-            .then((response) => {
-                this.userImages.push(`/${response.data.data}`);                  
-            }).catch((error)=>{
-                console.error(error);
-            }).finally(()=>{
-                this.processing = false
-            })
         },
+
+        /**
+         * Update the avatar to a selected image.
+         * @param {String} image - The URL of the selected image.
+         */
         async updateAvatar(image) {
-            this.processing = true
-            axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`        
-            await axios.put('/api/profile/updateavatar', {                
-                avatar: image,
-            })
-            .then((response)=>{
-                this.currentAvatar = response.data.data
-            }).catch((error)=>{
-                console.error(error);
-            }).finally(()=>{
-                this.processing = false
-            })
+            this.processing = true;
+            try {
+                axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`;
+                const payload = {
+                    avatar: image,
+                };
+                const response = await axios.put('/api/profile/updateprofile', payload);
+                if (response.data.success) {
+                    this.profile.profile_image1 = response.data.data.profile_image1;
+                    this.currentAvatar = response.data.data.profile_image1 || '/upload/images/profiles/default.png';
+
+                    // Update Vuex store with the new profile
+                    this.$store.commit('auth/SET_PROFILE', this.profile);
+                    alert('Avatar updated successfully');
+                } else {
+                    alert('Failed to update avatar.');
+                }
+            } catch (error) {
+                console.error('Error updating avatar:', error);
+                alert('Failed to update avatar.');
+            } finally {
+                this.processing = false;
+            }
         },
-        async getProfile() {
-            this.processing = true
-            axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
-            await axios.get('/api/profile/getprofile')
-            .then((response) => {                           
-                this.currentAvatar = response.data.data.avatar;
-            }).catch((error)=>{
-                console.error(error);
-            }).finally(()=>{
-                this.processing = false
-            })
-        }
     },
-}
+};
 </script>
+<style scoped>
+/* Add any component-specific styles here */
+
+/* Example: Customize the appearance of the upload buttons */
+.bg-connectyed-button-light {
+    background-color: #4CAF50; /* Example color */
+}
+
+.text-connectyed-button-dark {
+    color: #FFFFFF; /* Example color */
+}
+
+.bg-connectyed-button-hover {
+    background-color: #45a049; /* Example hover color */
+}
+
+.bg-connectyed-button-hover-light {
+    background-color: #66BB6A; /* Example hover light color */
+}
+
+.text-connectyed-button-hover-dark {
+    color: #FFFFFF; /* Example hover text color */
+}
+
+/* Additional styles as needed */
+</style>
