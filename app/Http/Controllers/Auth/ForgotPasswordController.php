@@ -1,53 +1,58 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail; // Add this import
+use Illuminate\Mail\Message;
 
 class ForgotPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset emails and
-    | includes a trait which assists in sending these notifications from
-    | your application to your users. Feel free to explore this trait.
-    |
-    */
-
-    use SendsPasswordResetEmails;
-}
-
-namespace App\Http\Controllers\Auth;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ResetsPasswords;
-
-class ResetPasswordController extends Controller
-{
-    use ResetsPasswords;
-
-    public function reset(Request $request)
+    public function sendResetLinkEmail(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|confirmed|min:8',
-        ]);
+        $request->validate(['email' => 'required|email']);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->save();
-            }
-        );
+        try {
+            Log::info('Attempting to send password reset link', ['email' => $request->email]);
+            
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
 
-        return $status === Password::PASSWORD_RESET
-            ? response()->json(['message' => 'Password reset successfully.'])
-            : response()->json(['message' => 'Failed to reset password.'], 500);
+            Log::info('Password reset attempt status:', ['status' => $status]);
+
+            return $status === Password::RESET_LINK_SENT
+                ? response()->json(['message' => 'Password reset link sent to your email'])
+                : response()->json(['error' => trans($status)], 400);
+        } catch (\Exception $e) {
+            Log::error('Reset password error:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Failed to send reset link: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function testMailConfiguration()
+    {
+        try {
+            $config = config('mail');
+            Log::info('Current mail configuration:', [
+                'host' => config('mail.host'),
+                'port' => config('mail.port'),
+                'encryption' => config('mail.encryption'),
+                'from_address' => config('mail.from.address'),
+            ]);
+            
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Mail configuration test failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
     }
 }

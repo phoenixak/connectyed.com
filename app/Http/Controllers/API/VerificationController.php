@@ -3,32 +3,48 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\URL;
 
 class VerificationController extends Controller
 {
-    public function verify(Request $request)
-    {        
-        // Find the user by ID
-        $user = User::find($request->route('id'));
+    public function verify(Request $request, $id, $hash)
+    {
+        // Remove any query parameters from the signature verification
+        $originalRequest = Request::create($request->fullUrl());
+        
+        if (! URL::hasValidSignature($originalRequest)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid verification link or link has expired.'
+            ], 403);
+        }
+
+        $user = User::findOrFail($id);
         
         if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified.'], 200);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Email already verified.'
+            ], 200);
         }
 
-        if (! hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Invalid verification link.'], 403);
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid verification link.'
+            ], 403);
         }
 
-        // Mark the email as verified
-        $user->markEmailAsVerified();
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
+        }
 
-        event(new Verified($user));
-
-        return response()->json(['message' => 'Email successfully verified.'], 200);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Email successfully verified.'
+        ], 200);
     }
 }

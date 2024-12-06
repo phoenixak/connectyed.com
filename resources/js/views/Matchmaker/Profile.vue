@@ -2,163 +2,252 @@
   <div class="max-w-4xl mx-auto p-6 bg-white rounded-sm shadow-sm">
     <h2 class="text-2xl font-semibold mb-4">Matchmaker Profile</h2>
         
-    <!-- Profile Picture -->
-    <div class="mb-4 w-1/4 ">      
-      <!-- Image Preview -->
-      <div class="flex mb-4" v-if="currentAvatar">
-        <img :src="currentAvatar" alt="Profile Preview" class="rounded-full object-cover w-48 h-48" />
-      </div>            
-      <!-- File input button -->
-      <label for="profile-picture" class="cursor-pointer w-full flex">
-      <span class="text-connectyed-button-dark bg-connectyed-button-light hover:bg-connectyed-button-hover
-      hover:text-connectyed-button-hover-dark focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2 w-full
-      justify-center text-center
-      ">
-          Upload Image
-      </span>
-      <input
-          type="file"
-          id="profile-picture"
-          class="hidden"
-          @change="uploadAvatar"
-          accept="image/*"
-      />
-      </label>                        
-    </div>    
+    <!-- Profile Pictures -->
+    <div class="mb-6 flex gap-4">
+      <!-- Profile Image 1 -->
+      <div class="w-1/3">
+        <h3 class="text-sm font-medium mb-2">Profile Image 1</h3>
+        <div class="mb-2" v-if="profile.profile_image1">
+          <img :src="profile.profile_image1" alt="Profile Image 1" class="rounded-lg object-cover w-48 h-48" />
+        </div>
+        <label class="cursor-pointer block">
+          <span class="text-connectyed-button-dark bg-connectyed-button-light hover:bg-connectyed-button-hover hover:text-connectyed-button-hover-dark focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2 block text-center">
+            Upload Image 1
+          </span>
+          <input
+            type="file"
+            class="hidden"
+            @change="uploadImage($event, 1)"
+            accept="image/*"
+          />
+        </label>
+      </div>
+
+      <!-- Profile Image 2 -->
+      <div class="w-1/3">
+        <h3 class="text-sm font-medium mb-2">Profile Image 2</h3>
+        <div class="mb-2" v-if="profile.profile_image2">
+          <img :src="profile.profile_image2" alt="Profile Image 2" class="rounded-lg object-cover w-48 h-48" />
+        </div>
+        <label class="cursor-pointer block">
+          <span class="text-connectyed-button-dark bg-connectyed-button-light hover:bg-connectyed-button-hover hover:text-connectyed-button-hover-dark focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2 block text-center">
+            Upload Image 2
+          </span>
+          <input
+            type="file"
+            class="hidden"
+            @change="uploadImage($event, 2)"
+            accept="image/*"
+          />
+        </label>
+      </div>
+    </div>
               
-    <form class="w-full" action="javascript:void(0)" @submit="postProfile" method="put">
+    <form class="w-full" @submit.prevent="postProfile">
       <!-- Name -->
-      <div class="flex flex-wrap -mx-3">
-          <div class="w-full px-3 mb-4 md:mb-0">
-          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="name">
-              Full Name
-          </label>
-          <input class="appearance-none block w-full border border-gray-500 rounded p-2 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" v-model="user.name" id="name">
-          </div>
-      </div>
-
       <div class="flex flex-wrap -mx-3 mb-4">
-          <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="yearsexperience">
-              Years of Experience
+        <div class="w-full px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="name">
+            Full Name
           </label>
-          <input class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.yearsexperience" id="yearsexperience" type="text">
-          </div>                              
+          <input 
+            class="appearance-none block w-full border border-gray-500 rounded p-2 leading-tight focus:outline-none focus:bg-white" 
+            type="text" 
+            v-model="profile.name" 
+            id="name"
+          >
+        </div>
       </div>
 
-      <div class="flex flex-wrap -mx-3">
+      <!-- Experience and Job Title -->
+      <div class="flex flex-wrap -mx-3 mb-4">
         <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="city">
-                City
-            </label>
-            <input class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.city" id="city" type="text">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="yearsexperience">
+            Years of Experience
+          </label>
+          <input 
+            class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+            v-model="profile.yearsexperience" 
+            id="yearsexperience" 
+            type="number"
+          >
+        </div>
+        <div class="w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="jobtitle">
+            Job Title
+          </label>
+          <input 
+            class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+            v-model="profile.jobtitle" 
+            id="jobtitle" 
+            type="text"
+          >
+        </div>
+      </div>
+
+      <!-- Location Fields -->
+      <div class="flex flex-wrap -mx-3 mb-4">
+        <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="city">
+            City
+          </label>
+          <input 
+            class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+            v-model="profile.city" 
+            id="city" 
+            type="text"
+          >
         </div>
         
-        <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="state">
-                State
-            </label>
-            <div class="relative">
-                <input class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.state" id="state" type="text">
-            </div>
+        <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="state">
+            State
+          </label>
+          <input 
+            class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+            v-model="profile.state" 
+            id="state" 
+            type="text"
+          >
         </div>
-    </div>   
 
-    <div class="flex flex-wrap -mx-3 mb-4">
-        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="country">
-                Country
-            </label>
-            <div class="relative">
-                <select class="block appearance-none w-full border-gray-200 text-gray-700 p-2 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" v-model="profile.country" id="country">
-                  <option value="United States of America">United States of America</option>
-                  <option value="Canada">Canada</option>													                    
-                  <option value="Other">Other</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
-            </div>
+        <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="country">
+            Country
+          </label>
+          <input 
+            class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+            v-model="profile.country" 
+            id="country" 
+            type="text"
+          >
         </div>
-    </div>        
+      </div>
+
+      <!-- Bio -->
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="bio">
+            Bio
+          </label>
+          <textarea 
+            class="appearance-none block w-full border border-gray-200 rounded p-2 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+            v-model="profile.bio" 
+            id="bio"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
 
       <!-- Submit Button -->
       <div class="flex items-center justify-end">
         <button
-          class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover hover:text-connectyed-button font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          class="bg-connectyed-button-light text-connectyed-button-dark hover:bg-connectyed-button-hover hover:text-connectyed-button-hover-dark font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
+          :disabled="processing"
         >
-          Save Profile
+          {{ processing ? 'Saving...' : 'Save Profile' }}
         </button>
       </div>
     </form>
-
   </div>
 </template>
-  
+
 <script>
+import axios from 'axios'
+
 export default {
   data() {
     return {
-      user:{},
-      profile:{},      
-      authorization:this.$store.state.auth.authorization,
-      currentAvatar: '/upload/images/profiles/default.png'
-    };
-  },  
-  mounted() {      
-      this.getProfile();
+      profile: {
+        name: '',
+        city: '',
+        state: '',
+        country: '',
+        yearsexperience: '',
+        jobtitle: '',
+        bio: '',
+        profile_image1: '',
+        profile_image2: '',
+      },
+      processing: false,
+      authorization: this.$store.state.auth.authorization,
+    }
   },
+  
+  mounted() {
+    this.getProfile()
+  },
+
   methods: {
-    async postProfile() {            
+    async postProfile() {
+      try {
         this.processing = true
-        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`        
-        await axios.put('/api/profile/update', {                
-            user: this.user,
-            profile: this.profile
+        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`
+        
+        const response = await axios.put('/api/profile/update', {
+          profile: this.profile
         })
-        .then(({data})=>{                
-            alert('Profile updated successfully');
-        }).catch((error)=>{
-            console.error(error);
-        }).finally(()=>{
-            this.processing = false
-        })
-    },  
-    async uploadAvatar(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const formData = new FormData();
-        formData.append("file", file);
-        this.processing = true            
-        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
-        await axios.post('/api/profile/uploadavatar', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
+
+        if (response.data.success) {
+          alert('Profile updated successfully')
         }
-        })
-          .then((response) => {                        
-            this.currentAvatar = response.data.data              
-        }).catch((error)=>{
-            console.error(error);
-        }).finally(()=>{
-            this.processing = false
-        })
+      } catch (error) {
+        console.error('Error updating profile:', error)
+        alert('Failed to update profile. Please try again.')
+      } finally {
+        this.processing = false
+      }
     },
-    async getProfile() {
+
+    async uploadImage(event, imageNumber) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      try {
         this.processing = true
-        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}` 
-        await axios.get('/api/profile/getprofile')
-          .then((response) => {                                       
-            this.currentAvatar = response.data.data.avatar;
-            this.profile = response.data.data;
-            this.user = response.data.data.user;
-        }).catch((error)=>{
-            console.error(error);
-        }).finally(()=>{
-            this.processing = false
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('image_number', imageNumber)
+
+        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`
+        const response = await axios.post('/api/profile/uploadimage', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         })
+
+        if (response.data.success) {
+          this.profile[`profile_image${imageNumber}`] = response.data.data
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        alert('Failed to upload image. Please try again.')
+      } finally {
+        this.processing = false
+      }
+    },
+
+    async getProfile() {
+      try {
+        this.processing = true
+        axios.defaults.headers.common.Authorization = `Bearer ${this.authorization.token}`
+        
+        const response = await axios.get('/api/profile/getprofile')
+        
+        if (response.data.success) {
+          this.profile = {
+            ...response.data.data,
+            name: response.data.data.name || response.data.data.user.name,
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error)
+        alert('Failed to load profile. Please refresh the page.')
+      } finally {
+        this.processing = false
+      }
     }
   }
-};
+}
 </script>

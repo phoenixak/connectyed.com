@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Availability extends Model
 {
@@ -15,10 +16,18 @@ class Availability extends Model
         'end_date',
         'start_time',
         'end_time',
+        'is_all_day', // Ensure this field is fillable
     ];
 
-    public function user()
+    protected $casts = [
+        'is_all_day' => 'boolean', // Cast to boolean
+    ];
+
+    /**
+     * Get the user that owns the availability.
+     */
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class); // assuming matchmakers are users
+        return $this->belongsTo(User::class); // Assuming matchmakers are users
     }
 }

@@ -14,10 +14,17 @@ class AdminController extends Controller
     {
         $this->middleware('auth:api', ['except' => []]);
     }   
-    // Fetch users with role 'candidate'
+
+    /**
+     * Fetch users with role 'candidate' along with their profiles.
+     */
     public function getCandidates()
     {
-        $candidates = User::where('role', 'candidate')->get();        
+        // Eager load the 'profile' relationship
+        $candidates = User::where('role', 'candidate')
+                          ->with('profile') // Include profile data
+                          ->get();        
+                          
         return response()->json([
             "success" => true,
             "data" => $candidates,
@@ -25,7 +32,9 @@ class AdminController extends Controller
         ], 200);
     }
 
-    // Approve a candidate by changing their role to 'matchmaker'
+    /**
+     * Approve a candidate by changing their role to 'matchmaker'.
+     */
     public function approveCandidate(Request $request)
     {
         $request->validate([
@@ -43,11 +52,14 @@ class AdminController extends Controller
         ], 200);
     }
 
+    /**
+     * Fetch users with role 'client' along with their profiles.
+     */
     public function getClients()
     {
         $clients = User::with('profile')
-        ->where('role', 'client')
-        ->get();        
+                       ->where('role', 'client')
+                       ->get();        
 
         return response()->json([
             "success" => true,

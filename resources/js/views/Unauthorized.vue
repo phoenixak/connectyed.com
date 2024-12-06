@@ -1,13 +1,13 @@
 <template>
     <div>
-        <h1>Unauthorized</h1>
-        <p>You don't have permission to view this page.</p>
-        <router-link to="/">Go back to home</router-link>
+        <h1>Access Restricted</h1>
+        <p>Your profile is awaiting approval by the administrator to allow you to log in to the dashboard.</p>
+        <router-link to="/">Return to Home</router-link>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'Unauthorized',
+        name: 'AccessRestricted',
     };
 </script>

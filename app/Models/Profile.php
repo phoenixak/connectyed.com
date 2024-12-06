@@ -12,7 +12,6 @@ class Profile extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'user_id',
         'matchmaker_id',
         'city',
@@ -22,6 +21,7 @@ class Profile extends Model
         'age',
         'gender',
         'bodytype',
+        'english_level', // Added this field
         'height',
         'inches',
         'haircolor',
@@ -31,31 +31,37 @@ class Profile extends Model
         'smoker',
         'drinker',
         'education',
-        'company',
         'jobtitle',
         'sports',
         'hobbies',
-        'english',
         'languages',
-        'avatar',
-        'description',
-        'comment'
+        'bio',
+        'profile_image1',
+        'profile_image2',
+        'yearsexperience',
+        'name', 
+
     ];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'age' => 'integer',
+        'yearsexperience' => 'integer',
+        'children' => 'integer',
+        'smoker' => 'boolean',
+        'height' => 'integer',
+        'inches' => 'integer',
+    ];
+
+    /**
+     * Get the user that owns the profile.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    // A matchmaker can have many clients
-    public function clients()
-    {
-        return $this->hasMany(Profile::class, 'matchmaker_id');
-    }
-
-    // A client belongs to a matchmaker
-    public function matchmaker()
-    {
-        return $this->belongsTo(Profile::class, 'matchmaker_id');
     }
 }
