@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Auth\Events\Registered; // Added import for Registered event
 
 class ClientController extends Controller
 {
@@ -139,14 +140,14 @@ class ClientController extends Controller
                 }
             }
 
-            // Create the client user
+            // Create the client user - Remove email_verified_at
             $clientUser = User::create([
                 'name' => $request->name,
                 'username' => $this->generateUsername($request->name),
                 'email' => $request->email,
                 'password' => Hash::make(Str::random(12)), // Increased randomness for security
-                'role' => 'client',
-                'email_verified_at' => now(),
+                'role' => 'client'
+                // Removed 'email_verified_at' to allow email verification
             ]);
 
             Log::info('Client user created successfully.', ['user_id' => $clientUser->id]);
@@ -200,6 +201,9 @@ class ClientController extends Controller
 
             Log::info('Profile record created successfully.', ['profile_id' => $profile->id]);
 
+            // Trigger the Registered event to send verification email
+            event(new Registered($clientUser));
+
             DB::commit();
 
             Log::info('Client added successfully.', ['client_user_id' => $clientUser->id]);
@@ -211,7 +215,7 @@ class ClientController extends Controller
                     'profile' => $profile,
                     'matchmaker_client' => $matchmakerClient
                 ],
-                'message' => 'Client added successfully.'
+                'message' => 'Client added successfully. A verification email has been sent to the client\'s email address.'
             ], 201);
 
         } catch (\Exception $e) {
@@ -597,43 +601,50 @@ class ClientController extends Controller
             ], 500);
         }
     }
-public function getPublicClientsByMatchmakerId($matchmakerId)
-{
-    try {
-        $clients = MatchmakerClient::where('matchmaker_id', $matchmakerId)
-            ->with([
-                'user:id,name'
-            ])
-            ->get(['id', 'user_id', 'thumbnail_image', 'age']);
 
-        // Transform the image paths
-        $clients->transform(function ($client) {
-            if ($client->thumbnail_image) {
-                $client->thumbnail_image = Storage::url($client->thumbnail_image);
-            } else {
-                $client->thumbnail_image = '/default-client-image.jpg'; // Set a default image if none exists
-            }
-            return [
-                'id' => $client->id,
-                'name' => $client->user->name,
-                'age' => $client->age,
-                'thumbnail_image' => $client->thumbnail_image,
-            ];
-        });
+    /**
+     * Get public clients for a specific matchmaker.
+     *
+     * @param int $matchmakerId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getPublicClientsByMatchmakerId($matchmakerId)
+    {
+        try {
+            $clients = MatchmakerClient::where('matchmaker_id', $matchmakerId)
+                ->with([
+                    'user:id,name'
+                ])
+                ->get(['id', 'user_id', 'thumbnail_image', 'age']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $clients,
-            'message' => 'Clients fetched successfully'
-        ]);
+            // Transform the image paths
+            $clients->transform(function ($client) {
+                if ($client->thumbnail_image) {
+                    $client->thumbnail_image = Storage::url($client->thumbnail_image);
+                } else {
+                    $client->thumbnail_image = '/default-client-image.jpg'; // Set a default image if none exists
+                }
+                return [
+                    'id' => $client->id,
+                    'name' => $client->user->name,
+                    'age' => $client->age,
+                    'thumbnail_image' => $client->thumbnail_image,
+                ];
+            });
 
-    } catch (\Exception $e) {
-        Log::error('Error fetching clients: ' . $e->getMessage(), ['exception' => $e]);
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to fetch clients',
-        ], 500);
+            return response()->json([
+                'success' => true,
+                'data' => $clients,
+                'message' => 'Clients fetched successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching clients: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch clients',
+            ], 500);
+        }
     }
-}
 
 }
